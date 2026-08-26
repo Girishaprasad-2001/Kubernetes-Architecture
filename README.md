@@ -141,3 +141,25 @@ Use code with caution.
 ### Interview Answer
 
 Kubernetes architecture consists of a Control Plane and Worker Nodes. The Control Plane contains API Server, Scheduler, Controller Manager, and etcd, which manage the cluster. Worker Nodes contain kubelet, kube-proxy, container runtime, and Pods. The API Server acts as the entry point, etcd stores cluster state, Scheduler places pods on nodes, and Controllers maintain the desired state of the cluster.
+
+### Kubernetes CNI (Container Network Interface)
+
+K8s CNI (Container Network Interface) is the networking standard used by Kubernetes to connect pods to the network.
+### What CNI does
+
+## When Kubernetes creates a pod, the CNI plugin:
+
+1. Assigns an IP address to the pod.
+2. Connects the pod to the cluster network.
+3. Configures routing between pods.
+4. Applies network policies (if supported).
+How it works
+```
+Kubernetes 
+   | 
+kubelet
+   |
+CNI Plugin
+   | 
+Network Configuration
+```
