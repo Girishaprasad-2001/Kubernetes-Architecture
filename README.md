@@ -3958,3 +3958,283 @@ Kubernetes automatically creates the PV.
 ## Interview Answer
 
 A Persistent Volume (PV) is a storage resource available in a Kubernetes cluster, while a Persistent Volume Claim (PVC) is a request for storage made by a Pod. Kubernetes binds a PVC to a suitable PV based on size and access mode. The Pod uses the PVC to access storage without knowing the underlying storage details. This separation allows storage to persist even when Pods are deleted or recreated.
+
+
+## ConfigMaps, Secrets, and Certificates in Kubernetes
+
+These are commonly used to manage configuration, sensitive data, and secure communication in Kubernetes.
+
+## 1. ConfigMap
+
+A ConfigMap stores non-sensitive configuration data as key-value pairs.
+
+Examples:
+
+Application settings
+URLs
+Environment variables
+Feature flags
+ConfigMap Example
+```
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+
+data:
+  APP_ENV: production
+  APP_PORT: "8080"
+  DB_HOST: mysql-service
+```
+Use ConfigMap in a Pod
+```
+env:
+  - name: APP_ENV
+    valueFrom:
+      configMapKeyRef:
+        name: app-config
+        key: APP_ENV
+```
+Verify
+```
+kubectl get configmap
+kubectl describe configmap app-config
+```
+Use Case
+
+Store items like:
+```
+Database Host
+Application Port
+Environment Name
+API URLs
+```
+✅ Visible in plain text
+
+✅ Easy to update
+
+❌ Not for passwords
+## 2. Secret
+
+A Secret stores sensitive information.
+
+Examples:
+
+Passwords
+API Keys
+Database credentials
+Tokens
+SSH keys
+Secret Example
+
+Create secret:
+
+```
+kubectl create secret generic db-secret \
+--from-literal=username=admin \
+--from-literal=password=Password123
+```
+
+Or YAML:
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-secret
+
+type: Opaque
+
+data:
+  username: YWRtaW4=
+  password: UGFzc3dvcmQxMjM=
+```
+(Base64 encoded)
+
+Use Secret in Pod
+```
+env:
+- name: DB_USER
+  valueFrom:
+    secretKeyRef:
+      name: db-secret
+      key: username
+
+- name: DB_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: db-secret
+      key: password
+```
+Verify
+```
+kubectl get secrets
+kubectl describe secret db-secret
+```
+Decode:
+```
+echo "YWRtaW4=" | base64 -d
+```
+Output:
+```
+admin
+```
+Secret Types
+```
+Opaque
+kubernetes.io/tls
+kubernetes.io/dockerconfigjson
+kubernetes.io/service-account-token
+```
+✅ Used for sensitive data
+
+✅ Can be mounted as files or environment variables
+
+```
+### ConfigMap vs Secret
+
+Feature 
+
+ConfigMap 
+
+Secret 
+
+****Purpose****
+Non-sensitive dataSensitive data
+****Storage****
+Plain textBase64 encoded
+****Examples****
+URLs, PortsPasswords, Tokens
+****Security****
+LowHigher
+****Environment Variables****
+YesYes
+```
+### Interview Answer
+
+ConfigMaps are used to store non-sensitive configuration data such as URLs, ports, and application settings. Secrets are used to store sensitive data like passwords, API keys, and tokens. Both can be consumed by Pods as environment variables or mounted volumes.
+
+## 3. Certificates in Kubernetes
+
+Certificates are used to secure communication between Kubernetes components.
+
+Why Certificates?
+
+Kubernetes components communicate over HTTPS.
+```
+kubectl
+   |
+TLS Certificate
+   |
+API Server
+```
+Certificates provide:
+
+Authentication
+Encryption
+Secure communication
+Important Certificates
+API Server Certificate
+
+Used by:
+```
+kubectl --> API Server
+```
+Location:
+``` /etc/kubernetes/pki/apiserver.crt ```
+CA Certificate
+
+Cluster Root Certificate Authority.
+
+Location:
+```
+/etc/kubernetes/pki/ca.crt
+```
+Used to sign all cluster certificates.
+## Kubelet Certificate
+
+Used by worker nodes to authenticate with API Server.
+
+Location:
+```
+/var/lib/kubelet/pki/
+```
+#### etcd Certificate
+
+Secures communication with etcd.
+
+Location:
+```
+/etc/kubernetes/pki/etcd/
+```
+#### Check Certificate Expiry
+
+Using kubeadm:
+```
+kubeadm certs check-expiration
+```
+Example Output:
+```
+CERTIFICATE                EXPIRES
+apiserver                  2027-01-10
+etcd-server                2027-01-10
+```
+Renew Certificates
+```
+kubeadm certs renew all
+```
+Restart services:
+```
+systemctl restart kubelet
+```
+TLS Secret Example
+
+Store SSL certificate in Kubernetes:
+```
+kubectl create secret tls nginx-tls \
+  --cert=tls.crt \
+  --key=tls.key
+```
+YAML
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nginx-tls
+type: kubernetes.io/tls
+data:
+  tls.crt: <base64-cert>
+  tls.key: <base64-key>
+```
+Used by Ingress:
+```
+tls:
+- hosts:
+  - app.example.com
+  secretName: nginx-tls
+```
+### Real-Time Example
+
+Suppose your application needs:
+
+ConfigMap
+```
+DB_HOST=mysql-service
+2
+APP_ENV=prod
+```
+Secret
+```
+DB_USERNAME=admin
+2
+DB_PASSWORD=Password123
+```
+TLS Certificate
+```
+app.company.com
+```
+
+HTTPS access for users through Ingress.
+
+### Interview Answer
+
+In Kubernetes, ConfigMaps store non-sensitive configuration such as environment variables, ports, and URLs. Secrets store sensitive data like passwords, API keys, and tokens, which can be mounted into Pods securely. Certificates are used for TLS authentication and encryption between Kubernetes components such as the API Server, kubelets, and etcd, and are also commonly stored as TLS Secrets for HTTPS-enabled applications and Ingress resources.
