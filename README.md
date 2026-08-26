@@ -2125,3 +2125,373 @@ Internet
 Ingress is the incoming traffic to applications running in Kubernetes. It routes external requests through an Ingress Controller to Kubernetes Services and Pods.
  Egress is the outgoing traffic from Pods to external systems such as APIs, databases, or internet services. Kubernetes can control egress traffic using Network Policies, firewalls, or service mesh solutions like Istio.
 
+## Kubernetes Master Node and Worker Node Troubleshooting Guide
+
+1. Master (Control Plane) Node Troubleshooting
+Check Control Plane Components
+```
+1 kubectl get componentstatus
+```
+
+Or check pods:
+
+```
+kubectl get pods -n kube-system
+```
+
+Look for:
+
+kube-apiserver
+kube-scheduler
+kube-controller-manager
+etcd
+API Server Issues
+
+Check API Server status:
+
+```
+kubectl cluster-info
+```
+
+If unreachable:
+
+```
+systemctl status kubelet
+```
+Check logs:
+
+```
+journalctl -u kubelet -f
+```
+
+Static pod logs:
+
+```
+kubectl logs -n kube-system kube-apiserver-<master-node>
+```
+
+Common issues:
+
+Certificate expired
+API server down
+Port 6443 blocked
+
+Verify:
+```
+netstat -tulnp | grep 6443
+```
+etcd Issues
+
+Check etcd pod:
+```
+kubectl get pods -n kube-system | grep etcd
+```
+
+View logs:
+
+```
+kubectl logs -n kube-system etcd-master
+```
+
+Check health:
+
+```
+ETCDCTL_API=3 etcdctl endpoint health
+```
+
+Common issues:
+
+Disk full
+Corrupted database
+Certificate issues
+Scheduler Issues
+
+Check Scheduler:
+
+```
+kubectl get pods -n kube-system | grep scheduler
+```
+
+Logs:
+
+```
+kubectl logs -n kube-system kube-scheduler-master
+```
+
+Symptoms:
+
+```
+Pods remain Pending
+```
+
+Possible causes:
+
+Resource shortage
+Node taints
+Affinity rules
+
+Check:
+
+```
+kubectl describe pod <pod-name>
+```
+Controller Manager Issues
+
+Check status:
+
+```
+kubectl get pods -n kube-system | grep controller
+```
+
+Logs:
+
+```
+kubectl logs -n kube-system kube-controller-manager-master
+```
+
+Symptoms:
+
+ReplicaSets not creating pods
+Nodes not updating
+2. Worker Node Troubleshooting
+Node Not Ready
+
+Check nodes:
+
+```
+kubectl get nodes
+```
+
+Output:
+
+```
+worker-1 NotReady
+```
+Detailed information:
+
+```
+kubectl describe node worker-1
+```
+kubelet Issues
+
+Check service:
+
+```
+systemctl status kubelet
+```
+
+Restart:
+
+```
+systemctl restart kubelet
+```
+
+View logs:
+
+```
+journalctl -u kubelet -f
+```
+
+Common issues:
+
+Wrong kubeconfig
+Certificate problems
+CPU/Memory pressure
+Container Runtime Issues
+
+For containerd:
+
+```
+systemctl status containerd
+```
+
+Restart:
+
+```
+systemctl restart containerd
+```
+
+Check containers:
+
+```
+crictl ps
+```
+
+Container runtime info:
+
+```
+crictl info
+```
+
+Common issues:
+
+Image pull failures
+Runtime service down
+Disk space exhausted
+CNI Network Issues
+
+Check CNI pods:
+
+```
+kubectl get pods -n kube-system
+```
+
+Example:
+
+```
+calico-node
+
+cilium
+
+flannel
+```
+
+Check logs:
+
+```
+kubectl logs -n kube-system <cni-pod>
+```
+
+Verify CNI configuration:
+
+```
+ls /etc/cni/net.d/
+```
+
+Symptoms:
+
+Pod stuck in ContainerCreating
+Pod-to-Pod communication failure
+kube-proxy Issues
+
+Check status:
+
+```
+kubectl get pods -n kube-system | grep kube-proxy
+```
+
+Check logs:
+
+```
+kubectl logs -n kube-system kube-proxy-xxxxx
+```
+
+Symptoms:
+
+Service not reachable
+ClusterIP not working
+3. Pod Troubleshooting
+Pod Stuck in Pending
+
+Check:
+
+```
+kubectl describe pod <pod-name>
+```
+
+Common causes:
+
+Insufficient CPU
+Insufficient Memory
+Taints
+PVC not bound
+Pod Stuck in ContainerCreating
+
+Check:
+
+```
+kubectl describe pod <pod-name>
+```
+
+Possible causes:
+
+CNI issue
+Volume mount issue
+Image pull issue
+CrashLoopBackOff
+
+Check logs:
+
+```
+kubectl logs <pod-name>
+```
+
+Previous crash logs:
+
+```
+kubectl logs <pod-name> --previous
+```
+
+Common causes:
+
+Application crash
+Wrong environment variables
+Database connectivity problems
+ImagePullBackOff
+
+Describe pod:
+
+```
+kubectl describe pod <pod-name>
+```
+
+Possible issues:
+
+Wrong image name
+Docker Hub access issue
+Private registry authentication failure
+4. Service Troubleshooting
+
+Check service:
+
+```
+kubectl get svc
+```
+ 
+Show more lines
+
+Describe:
+
+```
+kubectl describe svc nginx-service
+```
+
+Verify endpoints:
+
+```
+kubectl get endpoints
+```
+
+If endpoint is empty:
+
+```
+Selector mismatch
+```
+
+Check labels:
+
+```
+kubectl get pods --show-labels
+```
+5. DNS Troubleshooting
+
+Test DNS:
+
+```
+kubectl run dns-test --image=busybox -it --rm -- nslookup kubernetes.default
+```
+
+Check CoreDNS:
+
+```
+kubectl get pods -n kube-system | grep coredns
+```
+
+Logs:
+
+```
+kubectl logs -n kube-system <coredns-pod>
+```
+## Quick Interview Answer
+
+For master node troubleshooting, I check the health of API Server, Scheduler, Controller Manager, and etcd using kubectl get pods -n kube-system, component logs, and etcd health checks. For worker node troubleshooting, I verify node status, kubelet service, container runtime, CNI plugin, and kube-proxy. For application issues, I use kubectl describe pod, kubectl logs, and check events to identify problems such as Pending, CrashLoopBackOff, ImagePullBackOff, networking issues, or service endpoint mismatches.
