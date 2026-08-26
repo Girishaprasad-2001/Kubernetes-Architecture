@@ -934,3 +934,195 @@ Pod Containers
 #### 2-Minute Interview Answer
 
 When a Pod is created, kubectl sends the manifest to the API Server. The API Server validates the request and stores it in etcd. The Scheduler selects a suitable worker node and assigns the Pod. The kubelet on that node receives the assignment and instructs the container runtime (containerd/CRI-O) to pull the image and create the Pod sandbox. The CNI plugin configures networking and assigns a Pod IP. The application container starts, health checks are performed, and the Pod reaches the Running state. If a Service is present, kube-proxy routes traffic to the Pod.
+
+## Main Types of Kubernetes Controllers
+1. Replication Controller (Legacy)
+
+Ensures a specified number of pod replicas are running.
+
+YAML
+```
+apiVersion: v1
+kind: ReplicationController
+```
+Show more lines
+
+Mostly replaced by ReplicaSets and Deployments.
+
+2. ReplicaSet Controller
+
+Maintains the desired number of identical pod replicas.
+
+```
+1 apiVersion: apps/v1
+2 kind: ReplicaSet
+```
+Show more lines
+
+Example:
+
+Desired replicas = 3
+If one pod fails, ReplicaSet creates another pod automatically.
+3. Deployment Controller
+
+Manages ReplicaSets and provides:
+
+Rolling updates
+Rollbacks
+Scaling
+```
+1 apiVersion: apps/v1
+2 kind: Deployment
+```
+Show more lines
+
+Most commonly used controller for stateless applications.
+
+4. StatefulSet Controller
+
+Used for stateful applications requiring:
+
+Stable hostname
+Stable storage
+Ordered deployment and scaling
+
+Examples:
+
+MySQL
+PostgreSQL
+MongoDB
+```
+1 apiVersion: apps/v1
+2 kind: StatefulSet
+```
+Show more lines
+5. DaemonSet Controller
+
+Ensures one pod runs on every node (or selected nodes).
+
+Examples:
+
+Fluentd
+Filebeat
+Monitoring agents
+```
+1 apiVersion: apps/v1
+2 kind: DaemonSet
+```
+Show more lines
+6. Job Controller
+
+Runs pods until a task completes successfully.
+
+Example:
+
+Database migration
+Batch processing
+```
+1 apiVersion: batch/v1
+2 kind: Job
+```
+Show more lines
+7. CronJob Controller
+
+Runs Jobs on a schedule.
+
+Example:
+
+```
+1 apiVersion: batch/v1
+2 kind: CronJob
+```
+Show more lines
+
+Schedule:
+
+```
+1 schedule: "0 2 * * *"
+```
+Show more lines
+
+Runs every day at 2 AM.
+
+8. Node Controller
+
+Responsible for:
+
+Monitoring node health
+Detecting node failures
+Evicting pods from unhealthy nodes
+
+Part of the Kubernetes Controller Manager.
+
+9. EndpointSlice Controller
+
+Maintains EndpointSlice objects for Services and updates backend pod information.
+
+10. Service Account Controller
+
+Creates and manages default service accounts in namespaces.
+
+11. Namespace Controller
+
+Handles:
+
+Namespace creation
+Namespace deletion
+Resource cleanup
+12. Resource Quota Controller
+
+Enforces namespace resource limits.
+
+Example:
+
+```
+1 limits.cpu
+2 limits.memory
+3 pods
+4 services
+```
+Show more lines
+13. Horizontal Pod Autoscaler (HPA) Controller
+
+Automatically scales pods based on:
+
+CPU utilization
+Memory utilization
+Custom metrics
+```
+1 kubectl autoscale deployment nginx --cpu-percent=80 --min=2 --max=10
+```
+Show more lines
+Kubernetes Controller Manager
+
+Most built-in controllers run inside:
+
+```
+1 kube-controller-manager
+```
+Show more lines
+
+Examples:
+
+Node Controller
+Job Controller
+ReplicaSet Controller
+Deployment Controller
+Namespace Controller
+ServiceAccount Controller
+
+Check it:
+
+```
+1 kubectl get pods -n kube-system
+```
+Show more lines
+
+or on the control plane node:
+
+```
+1 ps -ef | grep kube-controller-manager
+```
+Show more lines
+#### Interview Answer
+Kubernetes controllers are control loops that watch cluster resources and reconcile the current state with the desired state. Common controller types include Deployment, ReplicaSet, StatefulSet, DaemonSet, Job, CronJob, Node Controller, Namespace Controller, and HPA Controller. Most built-in controllers run inside the kube-controller-manager component.
