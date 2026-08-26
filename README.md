@@ -43,3 +43,127 @@ Worker Nodes maintain running pods and provide the actual Kubernetes runtime env
 * **kubelet**: An agent that runs on each node in the cluster. It ensures that containers are running in a Pod according to the specifications.
 * **kube-proxy**: A network proxy that runs on each node, maintaining network rules to allow network communication to your Pods.
 * **Pods**: The smallest deployable units of computing that you can create and manage in Kubernetes. They host your containerized applications.
+
+### Kubernetes Architecture
+
+Kubernetes architecture consists of a Control Plane and Worker Nodes. 
+
++-----------------------------------+
+
+|           Control Plane           |
+|  +-----------------------------+  |
+|  | API Server                  |  |
+|  | Scheduler                   |  |
+|  | Controller Manager          |  |
+|  | etcd                        |  |
+|  +-----------------------------+  |
++-----------------------------------+
+                  |
+        +---------+---------+
+
+        |                   |
++---------------+   +---------------+
+
+|  Worker Node  |   |  Worker Node  |
+|  +---------+  |   |  +---------+  |
+|  | kubelet |  |   |  | kubelet |  |
+|  | proxy   |  |   |  | proxy   |  |
+|  | Pods    |  |   |  | Pods    |  |
+|  +---------+  |   |  +---------+  |
++---------------+   +---------------+
+
+### 1. Control Plane Components
+
+### API Server (kube-apiserver)
+
+* Entry point for all Kubernetes operations.
+* Receives requests from users, kubectl, and other components.
+* Validates and processes API requests.
+
+### etcd
+
+* Distributed key-value database.
+* Stores all cluster configuration and state information.
+* Acts as the single source of truth for the cluster.
+
+### Scheduler (kube-scheduler)
+
+* Decides on which worker node a pod should run.
+* Considers CPU, memory, affinities, taints, and constraints.
+
+### Controller Manager (kube-controller-manager)
+
+Runs various controllers such as: 
+
+* Deployment Controller
+* ReplicaSet Controller
+* Node Controller
+* Job Controller
+* Namespace Controller
+
+Ensures the actual state matches the desired state. 
+
+### 2. Worker Node Components
+
+### kubelet
+
+* Agent running on each node.
+* Communicates with the API Server.
+* Ensures containers in pods are running as expected.
+
+### kube-proxy
+
+* Handles network communication.
+* Maintains Service networking and load balancing rules.
+
+### Container Runtime
+
+Responsible for running containers. 
+
+**Examples:** 
+
+* containerd
+* CRI-O
+
+### 3. Pods
+
+Smallest deployable unit in Kubernetes. One or more containers share: 
+
+* Network namespace
+* Storage volumes
+
+**Example:** 
+
+yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+
+Use code with caution.
+
+### Request Flow Example
+
+When you run: 
+
+bash
+
+kubectl apply -f deployment.yaml
+
+Use code with caution.
+
+1. Request goes to API Server.
+2. Configuration is stored in etcd.
+3. Scheduler selects a worker node.
+4. kubelet creates the pod on the selected node.
+5. kube-proxy enables network access.
+6. Application becomes available.
+
+### Interview Answer
+
+Kubernetes architecture consists of a Control Plane and Worker Nodes. The Control Plane contains API Server, Scheduler, Controller Manager, and etcd, which manage the cluster. Worker Nodes contain kubelet, kube-proxy, container runtime, and Pods. The API Server acts as the entry point, etcd stores cluster state, Scheduler places pods on nodes, and Controllers maintain the desired state of the cluster.
