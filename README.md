@@ -471,6 +471,22 @@ output "account_id" {
   value = data.aws_caller_identity.current.account_id
 }
 ```
+## Import vs Data Source
+
+| Feature | Terraform Import | Terraform Data Source |
+| :--- | :--- | :--- |
+| **Purpose** | Manage existing resource | Read existing resource |
+| **Creates resource** | No | No |
+| **Modifies resource** | Yes (after import) | No |
+| **Stored in Terraform state** | Yes | Read-only state information |
+| **Configuration block** | `resource` | `data` |
+| **Lifecycle managed by Terraform** | Yes | No |
+
 ###### Interview Answer
 
 Terraform Data Sources are used to fetch information about existing infrastructure or external resources. Unlike resources, data sources do not create or modify anything; they only read and provide data that can be used by Terraform configurations. Examples include fetching existing VPCs, AMIs, Security Groups, and account information.
+
+##### Interview Answer (Short)
+
+Terraform Import is used to bring existing infrastructure under Terraform management by adding it to the Terraform state.
+ Terraform Data Source is used to read information about existing resources without managing or modifying them. Import is for ownership and lifecycle management, while a data source is for reference and consumption of existing infrastructure.
