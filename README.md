@@ -1977,3 +1977,150 @@ Istio Service Mesh
 ### Interview Answer
 
 A Service Mesh is an infrastructure layer that manages service-to-service communication in a microservices environment. Istio is a popular Service Mesh for Kubernetes that uses Envoy sidecar proxies and the Istiod control plane. It provides traffic management, mTLS security, observability, load balancing, retries, circuit breaking, and canary deployments without requiring changes to application code.
+## Ingress and Egress in Kubernetes
+1. Ingress (Incoming Traffic)
+
+Ingress controls how external traffic reaches services inside the Kubernetes cluster.
+
+Workflow
+```
+Internet User
+      │
+      ▼
+Ingress Controller
+      │
+      ▼
+Kubernetes Service
+      │
+      ▼
+Pod
+```
+Example
+
+Suppose you have an Nginx application:
+```
+Pod → Service → Ingress
+```
+Ingress YAML
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+spec:
+  ingressClassName: nginx
+
+  rules:
+  - host: app.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-service
+            port:
+              number: 80
+```
+Apply:
+```
+kubectl apply -f ingress.yaml
+```
+When a user opens:
+```
+http://app.example.com
+```
+Traffic flows as:
+```
+User
+  ↓
+Ingress Controller
+  ↓
+nginx-service
+  ↓
+Nginx Pods
+`
+```
+Popular Ingress Controllers
+NGINX Ingress Controller
+HAProxy Ingress
+Traefik
+AWS ALB Controller
+Azure Application Gateway Ingress Controller
+2. Egress (Outgoing Traffic)
+
+Egress is traffic that leaves a Pod and goes outside the cluster.
+
+Examples:
+
+Pod calling an external API
+Pod connecting to a database outside K8s
+Pod downloading packages from the internet
+Workflow
+```
+Pod
+ ↓
+Node Network
+ ↓
+Internet / External Service
+```
+Example:
+```
+Application Pod
+      ↓
+api.github.com
+or
+Application Pod
+      ↓
+Azure SQL Database
+```
+
+### Controlling Egress with Network Policies
+
+By default, Pods can usually access external networks.
+
+You can restrict outbound traffic using a NetworkPolicy.
+
+Example
+
+Allow only DNS traffic:
+```
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: restrict-egress
+spec:
+  podSelector: {}
+
+  policyTypes:
+  - Egress
+
+  egress:
+  - ports:
+    - protocol: UDP
+      port: 53
+```
+End-to-End Example
+Ingress
+```
+Browser
+   ↓
+Ingress
+   ↓
+Service
+   ↓
+Pod
+```
+Egress
+```
+Pod
+   ↓
+External API
+   ↓
+Internet
+```
+## Interview Answer
+
+Ingress is the incoming traffic to applications running in Kubernetes. It routes external requests through an Ingress Controller to Kubernetes Services and Pods.
+ Egress is the outgoing traffic from Pods to external systems such as APIs, databases, or internet services. Kubernetes can control egress traffic using Network Policies, firewalls, or service mesh solutions like Istio.
+
