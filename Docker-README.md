@@ -1472,3 +1472,239 @@ COPY --from=build /app/target/*.jar app.jar
 
 ENTRYPOINT ["java","-jar","app.jar"]
 ```
+Copilot said:
+
+For a Java application, a Docker multi-stage build can have dedicated stages such as:
+
+AS build → Download dependencies
+AS compile → Compile source code
+AS testing → Run unit tests
+AS builder → Package JAR/WAR
+AS runner → Lightweight runtime image
+Example: Maven-based Spring Boot Application
+```
+# -----------------------------
+# Stage 1: Build Dependencies
+# -----------------------------
+FROM maven:3.9.8-eclipse-temurin-17 AS build
+
+WORKDIR /app
+
+COPY pom.xml .
+
+# Download dependencies
+RUN mvn dependency:go-offline
+
+# -----------------------------
+# Stage 2: Compile Source Code
+# -----------------------------
+FROM build AS compile
+
+COPY src ./src
+
+RUN mvn clean compile
+
+# -----------------------------
+# Stage 3: Run Unit Tests
+# -----------------------------
+FROM compile AS testing
+
+RUN mvn test
+
+# -----------------------------
+# Stage 4: Package Application
+# -----------------------------
+FROM testing AS builder
+
+RUN mvn package -DskipTests
+
+# -----------------------------
+# Stage 5: Runtime Image
+# -----------------------------
+FROM eclipse-temurin:17-jre AS runner
+
+WORKDIR /app
+
+COPY --from=builder /app/target/*.jar app.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java","-jar","app.jar"]
+```
+## Workflow
+Stage 1: build
+Dockerfile
+```
+1
+FROM maven:3.9.8-eclipse-temurin-17 AS build
+2
+ 
+```
+
+Purpose:
+
+Download Maven dependencies
+Cache dependencies
+Speeds up future builds
+Dockerfile
+```
+1
+COPY pom.xml .
+2
+RUN mvn dependency:go-offline
+```
+Stage 2: compile
+Dockerfile
+```
+1
+FROM build AS compile
+```
+
+Purpose:
+
+Compile Java code
+Dockerfile
+```
+1
+COPY src ./src
+2
+RUN mvn clean compile
+```
+
+Generated:
+
+```
+target/classes
+2
+ 
+```
+Stage 3: testing
+Dockerfile
+```
+1
+FROM compile AS testing
+2
+ 
+```
+
+Purpose:
+
+Run JUnit tests
+Validate application before packaging
+Dockerfile
+```
+1
+RUN mvn test
+```
+
+If tests fail:
+
+```
+Docker build fails
+```
+Stage 4: builder
+Dockerfile
+```
+1
+FROM testing AS builder
+```
+
+Purpose:
+
+Create final JAR/WAR
+Dockerfile
+```
+1
+RUN mvn package -DskipTests
+```
+
+Output:
+
+```
+target/myapp.jar
+```
+Stage 5: runner
+Dockerfile
+```
+1
+FROM eclipse-temurin:17-jre AS runner
+```
+
+Purpose:
+
+Minimal runtime image
+No Maven
+No source code
+No compiler
+Dockerfile
+```
+1
+COPY --from=builder /app/target/*.jar app.jar
+```
+
+Run application:
+
+Dockerfile
+```
+1
+ENTRYPOINT ["java","-jar","app.jar"]
+```
+Why Use Multiple Stages?
+Single-Stage Build
+```
+JDK
+Maven
+Source Code
+Tests
+Dependencies
+Application
+```
+
+Image Size:
+
+```
+800MB+
+```
+Multi-Stage Build
+```
+JRE
+Application JAR
+```
+Image Size:
+
+```
+150MB-250MB
+```
+
+Benefits:
+
+Smaller image
+Faster deployment
+Better security
+Reduced attack surface
+Cleaner production container
+Build and Run
+
+Build image:
+
+```
+docker build -t springboot-app:v1 .
+```
+
+Run container:
+
+```
+docker run -d -p 8080:8080 springboot-app:v1
+```
+
+Verify:
+
+```
+docker ps
+```
+```
+curl http://localhost:8080
+```
+### Interview Answer
+
+In a Java Docker multi-stage build, build downloads dependencies, compile compiles the source code, testing runs unit tests, builder packages the application into a JAR/WAR, and runner contains only the JRE and packaged artifact. The final stage copies the generated JAR from the builder stage, resulting in a smaller, more secure production image.
