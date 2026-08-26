@@ -1438,3 +1438,37 @@ Can only be overridden using --entrypoint
 ## Best Answer for Interview
 
 Use ENTRYPOINT to define the main application that the container should always run and use CMD to provide default arguments. Prefer the exec form (["command","arg"]) instead of shell form for proper signal handling and Kubernetes compatibility. A common best practice is to combine them, where ENTRYPOINT defines the executable and CMD supplies default parameters that can be overridden at runtime.
+## Complete Enterprise Example
+```
+# Stage 1 - Compile
+FROM maven:3.9-eclipse-temurin-17 AS compile
+
+WORKDIR /app
+
+COPY pom.xml .
+COPY src ./src
+
+RUN mvn compile
+
+
+# Stage 2 - Testing
+FROM compile AS testing
+
+RUN mvn test
+
+
+# Stage 3 - Build Package
+FROM compile AS build
+
+RUN mvn clean package -DskipTests
+
+
+# Stage 4 - Runtime
+FROM eclipse-temurin:17-jre AS runner
+
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar app.jar
+
+ENTRYPOINT ["java","-jar","app.jar"]
+```
