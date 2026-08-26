@@ -1472,16 +1472,17 @@ COPY --from=build /app/target/*.jar app.jar
 
 ENTRYPOINT ["java","-jar","app.jar"]
 ```
-Copilot said:
 
-For a Java application, a Docker multi-stage build can have dedicated stages such as:
+## For a Java application, a Docker multi-stage build can have dedicated stages such as:
 
 AS build → Download dependencies
 AS compile → Compile source code
 AS testing → Run unit tests
 AS builder → Package JAR/WAR
 AS runner → Lightweight runtime image
+
 Example: Maven-based Spring Boot Application
+
 ```
 # -----------------------------
 # Stage 1: Build Dependencies
