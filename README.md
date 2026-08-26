@@ -406,5 +406,71 @@ Then run:
 ```
 terraform plan
 terraform apply
-
+```
 This approach is preferred for Infrastructure as Code because the import operation can be tracked and reviewed alongside your Terraform configuration.
+### What is a Data Source in Terraform? 
+
+A data source allows Terraform to read existing information from a cloud provider, service, or infrastructure without creating or modifying it.
+
+##### Example
+
+Read an existing AWS VPC:
+```
+data "aws_vpc" "existing" {
+  id = "vpc-12345678"
+}
+
+output "vpc_cidr" {
+  value = data.aws_vpc.existing.cidr_block
+}
+```
+Here:
+
+data = Data source block
+aws_vpc = Data source type
+existing = Local name
+Terraform fetches the VPC details from AWS
+
+##### Data Source vs Resource
+
+Resource creates or manages infrastructure:
+```
+resource "aws_instance" "web" {
+  ami           = "ami-123456"
+  instance_type = "t2.micro"
+}
+```
+Data Source only reads existing infrastructure:
+```
+data "aws_ami" "latest" {
+  most_recent = true
+
+  owners = ["amazon"]
+}
+```
+##### Common Data Sources
+Get Latest AMI
+```
+data "aws_ami" "amazon_linux" {
+  most_recent = true
+
+  owners = ["amazon"]
+}
+```
+Get Existing Security Group
+```
+data "aws_security_group" "sg" {
+  name = "web-sg"
+}
+```
+Get Current AWS Account ID
+```
+data "aws_caller_identity" "current" {}
+
+output "account_id" {
+  value = data.aws_caller_identity.current.account_id
+}
+```
+###### Interview Answer
+
+Terraform Data Sources are used to fetch information about existing infrastructure or external resources. Unlike resources, data sources do not create or modify anything; they only read and provide data that can be used by Terraform configurations. Examples include fetching existing VPCs, AMIs, Security Groups, and account information.
