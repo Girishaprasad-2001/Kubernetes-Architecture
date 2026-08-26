@@ -207,3 +207,90 @@ cat /etc/cni/net.d/*.conf
 5. Integrates Kubernetes with cloud and on-premises networks
 
 In short, CNI is the networking layer that makes Kubernetes pods communicate with each other and the outside world.
+
+
+## In Docker, CMD and ENTRYPOINT define what runs when a container starts.
+### CMD
+
+CMD provides the default command or arguments for a container.
+
+#### Example
+
+```
+FROM nginx
+
+CMD ["nginx", "-g", "daemon off;"]
+```
+When you run:
+```
+docker run myimage
+```
+Docker executes:
+```
+nginx -g "daemon off;"
+```
+Override CMD:
+``
+docker run myimage echo hello
+```
+Output:
+```
+hello
+```
+The new command replaces the CMD instruction.
+
+### ENTRYPOINT
+
+ENTRYPOINT specifies the main executable that always runs.
+
+#### Example
+```
+FROM ubuntu
+
+ENTRYPOINT ["echo"]
+```
+Run:
+```
+docker run myimage hello
+```
+Result:
+```
+hello
+```
+Here, hello is passed as an argument to the ENTRYPOINT command.
+
+### CMD + ENTRYPOINT Together
+
+This is the most common pattern.
+```
+FROM ubuntu
+
+ENTRYPOINT ["echo"]
+CMD ["Hello World"]
+```
+Run:
+```
+docker run myimage
+```
+Output:
+```
+Hello World
+```
+Override CMD:
+```
+docker run myimage Kubernetes
+```
+Output:
+```
+Kubernetes
+```
+Docker executes:
+```
+echo Kubernetes
+```
+Difference
+     |   CMD	   |     ENTRYPOINT |
+| :--- | :--- |
+| Provides default command/arguments	   | Defines the main executable |
+| Easily overridden at runtime	    |     Not overridden unless --entrypoint is used |
+| Can be omitted	                  |     Usually used when container has a fixed purpose |
