@@ -3222,3 +3222,533 @@ kubectl describe pod <pod>
 ### Interview Answer
 
 When troubleshooting kubelet issues, I first check the node status using kubectl get nodes and kubectl describe node. Then I verify the kubelet service with systemctl status kubelet and review logs using journalctl -u kubelet -f. I also validate connectivity to the API Server, check the container runtime (containerd), inspect CNI networking, and review pod events. Most kubelet problems are related to API Server connectivity, expired certificates, resource pressure, container runtime failures, or networking issues.
+
+## Deployment YAML Explained
+Example:
+```
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+
+spec:
+  replicas: 3
+
+  selector:
+    matchLabels:
+      app: nginx
+
+  template:
+    metadata:
+      labels:
+        app: nginx
+
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.25
+        ports:
+        - containerPort: 80
+
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+```
+apiVersion
+```
+apiVersion: apps/v1
+```
+
+Specifies the Kubernetes API version used.
+
+Examples:
+
+```
+apps/v1
+2
+v1
+3
+batch/v1
+4
+networking.k8s.io/v1
+```
+
+For Deployment:
+
+```
+1
+apps/v1
+```
+kind
+```
+kind: Deployment
+```
+Defines the object type.
+
+Examples:
+
+```
+Pod
+2
+Deployment
+3
+Service
+4
+ConfigMap
+5
+Ingress
+6
+Secret
+```
+metadata
+
+Stores information about the object.
+
+```
+metadata:
+2
+name: nginx-deployment
+```
+
+Deployment name.
+
+Check using:
+
+```
+kubectl get deployment
+```
+
+Output:
+
+```
+nginx-deployment
+```
+labels
+```
+labels:
+2
+app: nginx
+```
+
+Key-value pairs used for identification.
+
+Example:
+
+```
+app: nginx
+2
+environment: prod
+3
+tier: frontend
+```
+
+Check:
+
+```
+kubectl get pods --show-labels
+```
+spec Section
+
+Defines desired state.
+
+```
+spec:
+```
+replicas
+```
+replicas: 3
+```
+
+Number of Pod copies.
+
+Result:
+
+```
+nginx-pod-1
+2
+nginx-pod-2
+3
+nginx-pod-3
+```
+
+Scale manually:
+
+```
+kubectl scale deployment nginx-deployment --replicas=5
+```
+selector
+```
+selector:
+2
+matchLabels:
+3
+app: nginx
+```
+
+Deployment manages Pods matching these labels.
+
+Pod label:
+
+```
+app: nginx
+```
+
+must match.
+
+template
+
+Blueprint for creating Pods.
+
+```
+template:
+```
+
+Everything inside template becomes the Pod specification.
+
+template.metadata.labels
+```
+metadata:
+2
+labels:
+3
+app: nginx
+```
+
+Pod labels.
+
+Service uses these labels to find Pods.
+
+template.spec
+
+Pod definition begins here.
+
+```
+spec:
+```
+containers
+```
+containers:
+```
+
+List of containers in Pod.
+
+Example:
+
+```
+containers:
+2
+- name: nginx
+3
+image: nginx
+4
+ 
+```
+
+One Pod can run multiple containers.
+
+name
+```
+name: nginx
+```
+
+Container name.
+
+image
+```
+image: nginx:1.25
+```
+
+Container image.
+
+Examples:
+
+```
+nginx
+2
+nginx:latest
+3
+tomcat:9
+4
+redis:7
+```
+
+Kubernetes pulls image from registry.
+
+ports
+```
+ports:
+2
+- containerPort: 80
+3
+``
+```
+
+Application listens on port 80 inside container.
+
+Not exposed externally.
+
+resources
+
+Controls CPU and Memory usage.
+
+```
+resources:
+```
+Requests
+
+Minimum resources required.
+
+```
+requests:
+2
+cpu: "100m"
+3
+memory: "128Mi"
+```
+
+Meaning:
+
+```
+CPU = 0.1 Core
+2
+Memory = 128 MB
+```
+
+Scheduler uses requests.
+
+Limits
+
+Maximum resources allowed.
+
+```
+limits:
+2
+cpu: "500m"
+3
+memory: "512Mi"
+```
+
+Meaning:
+
+```
+CPU = 0.5 Core
+2
+Memory = 512 MB
+```
+
+Container cannot exceed limits.
+
+### Service YAML Explained
+Example:
+```
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: nginx-service
+
+spec:
+  selector:
+    app: nginx
+
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+
+  type: ClusterIP
+```
+apiVersion
+```
+apiVersion: v1
+```
+
+Service belongs to core API group.
+
+kind
+```
+kind: Service
+```
+
+Creates a Service object.
+
+metadata
+```
+metadata:
+2
+name: nginx-service
+```
+
+Service name.
+
+Access internally:
+
+```
+http://nginx-service
+```
+spec.selector
+```
+selector:
+2
+app: nginx
+```
+
+Finds pods with label:
+
+```
+app: nginx
+```
+
+Example Pod:
+
+```
+labels:
+2
+app: nginx
+```
+
+Service sends traffic to these Pods.
+
+ports
+
+Defines port mapping.
+
+```
+ports:
+```
+protocol
+```
+protocol: TCP
+```
+
+Network protocol.
+
+Options:
+
+```
+TCP
+2
+UDP
+3
+SCTP
+```
+port
+```
+port: 80
+```
+
+Service port.
+
+Client accesses:
+
+```
+http://service-name:80
+```
+targetPort
+```
+targetPort: 80
+```
+
+Port inside Pod container.
+
+Flow:
+```
+Client
+   |
+Service Port 80
+   |
+Target Port 80
+   |
+Pod
+```
+Example:
+```
+port: 80
+targetPort: 8080
+```
+Traffic Flow:
+```
+Service:80 --> Pod:8080
+```
+type
+ClusterIP
+```
+type: ClusterIP
+```
+
+Internal access only.
+
+NodePort
+```
+type: NodePort
+```
+```
+ports:
+2
+- port: 80
+3
+targetPort: 80
+4
+nodePort: 30080
+```
+
+Access:
+
+```
+<NodeIP>:30080
+```
+LoadBalancer
+```
+type: LoadBalancer
+```
+
+Creates cloud load balancer.
+```
+Internet
+   |
+Load Balancer
+   |
+Service
+   |
+Pods
+```
+ExternalName
+YAML
+1
+type: ExternalName
+2
+externalName: google.com
+Show more lines
+
+Maps service to external DNS.
+
+### Deployment + Service Relationship
+```
+Deployment
+    |
+Creates
+    v
+Pods
+    |
+Labels
+    v
+app=nginx
+    |
+Service Selector
+    v
+app=nginx
+    |
+Traffic Forwarded
+    v
+Pods
+```
+### Interview Answer
+
+A Deployment YAML defines how applications run in Kubernetes, including replicas, container images, labels, selectors, resource requests, and limits. A Service YAML exposes those Pods using selectors and provides stable networking. The Service forwards traffic from the service port to the target port of matching Pods, while the Deployment ensures the desired number of Pods are always running.
