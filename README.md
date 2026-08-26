@@ -225,12 +225,15 @@ When you run:
 ```
 docker run myimage
 ```
+
 Docker executes:
+
 ```
 nginx -g "daemon off;"
 ```
+
 Override CMD:
-``
+```
 docker run myimage echo hello
 ```
 Output:
