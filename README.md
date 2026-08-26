@@ -304,3 +304,20 @@ echo Kubernetes
 | Easily overridden at runtime | Not overridden unless `--entrypoint` is used |
 | Can be omitted | Usually used when container has a fixed purpose |
 
+
+### Override ENTRYPOINT
+
+Docker allows overriding ENTRYPOINT:
+
+```
+docker run --entrypoint /bin/bash myimage
+
+```
+
+This starts Bash instead of the image's configured ENTRYPOINT.
+
+
+## Interview Answer
+
+ENTRYPOINT specifies the main process that always runs when a container starts, while CMD provides default arguments or a default command. When both are used together, ENTRYPOINT defines the executable and CMD supplies its default parameters, which can be overridden during docker run.
+
