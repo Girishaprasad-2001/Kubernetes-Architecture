@@ -1181,6 +1181,7 @@ hello is appended.
 
 Best Practice
 Dockerfile
+```
 1
 ENTRYPOINT ["python"]
 2
@@ -1212,7 +1213,7 @@ Executes:
 ```
 python test.py
 ```
-14. HEALTHCHECK
+## 14. HEALTHCHECK
 
 Checks container health.
 
