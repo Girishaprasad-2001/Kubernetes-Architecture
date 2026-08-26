@@ -1420,3 +1420,21 @@ EXPOSE = Documentation
 ## Interview Answer (2-Minute Version)
 
 A Dockerfile is a set of instructions used to build a Docker image. Common instructions include FROM (base image), COPY/ADD (copy files), RUN (execute build commands), WORKDIR (set working directory), ENV and ARG (variables), EXPOSE (document ports), VOLUME (persistent storage), USER (container user), CMD (default startup command), ENTRYPOINT (fixed executable), and HEALTHCHECK (health monitoring). Docker builds images layer by layer, and each instruction creates a new layer, enabling caching and faster builds.
+
+## Common Interview Questions
+CMD vs ENTRYPOINT
+
+CMD
+
+Provides default command/arguments
+Can be overridden by docker run
+
+ENTRYPOINT
+
+Defines the main executable
+Runs every time container starts
+Can only be overridden using --entrypoint
+
+## Best Answer for Interview
+
+Use ENTRYPOINT to define the main application that the container should always run and use CMD to provide default arguments. Prefer the exec form (["command","arg"]) instead of shell form for proper signal handling and Kubernetes compatibility. A common best practice is to combine them, where ENTRYPOINT defines the executable and CMD supplies default parameters that can be overridden at runtime.
