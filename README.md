@@ -1511,6 +1511,7 @@ app=nginx
 Pod1
 Pod2
 Pod3
+```
 4. Verify Service
 
 View Service:
