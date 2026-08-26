@@ -2495,3 +2495,116 @@ kubectl logs -n kube-system <coredns-pod>
 ## Quick Interview Answer
 
 For master node troubleshooting, I check the health of API Server, Scheduler, Controller Manager, and etcd using kubectl get pods -n kube-system, component logs, and etcd health checks. For worker node troubleshooting, I verify node status, kubelet service, container runtime, CNI plugin, and kube-proxy. For application issues, I use kubectl describe pod, kubectl logs, and check events to identify problems such as Pending, CrashLoopBackOff, ImagePullBackOff, networking issues, or service endpoint mismatches.
+
+## 1. Check All Nodes Resource Usage
+```
+kubectl top nodes
+```
+
+Example output:
+
+```
+NAME       CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%
+worker-1   850m         42%    4200Mi          55%
+worker-2   650m         32%    3800Mi          48%
+```
+
+
+Requires Metrics Server to be installed.
+
+2. Check a Specific Node
+```
+kubectl top node <node-name>
+```
+
+Example:
+
+```
+kubectl top node worker-1
+```
+3. Get Detailed Node Information
+```
+kubectl describe node <node-name>
+
+ 
+```
+
+Look for:
+
+```
+Capacity:
+
+cpu: 4
+
+memory: 8192Mi
+Allocatable:
+
+cpu: 3900m
+
+memory: 7800Mi
+```
+
+And:
+```
+Allocated resources:
+
+Resource Requests Limits
+
+cpu 1200m 2400m
+
+memory 2Gi 4Gi
+```
+4. Check Pod Usage on a Node
+```
+kubectl top pods -A
+```
+
+or
+
+```
+kubectl top pods -A --sort-by=cpu
+```
+```
+kubectl top pods -A --sort-by=memory
+```
+5. Check Node Status
+```
+kubectl get nodes
+```
+
+Example:
+
+```
+NAME STATUS ROLES AGE
+
+master-1 Ready control-plane 30d
+worker-1 Ready <none> 30d
+```
+6. From the Node (Linux OS)
+```
+CPU:
+```
+```
+top
+```
+
+or
+
+```
+htop
+```
+```
+Memory:
+```
+```
+free -h
+```
+
+Disk:
+
+```
+df -h
+```
+### Interview Answer
+
+To check Kubernetes node resource utilization, use kubectl top nodes for CPU and memory consumption. For detailed node capacity, allocatable resources, and pod allocations, use kubectl describe node <node-name>. The Metrics Server must be installed for the kubectl top commands to work.
