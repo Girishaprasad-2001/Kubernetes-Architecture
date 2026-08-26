@@ -2608,3 +2608,271 @@ df -h
 ### Interview Answer
 
 To check Kubernetes node resource utilization, use kubectl top nodes for CPU and memory consumption. For detailed node capacity, allocatable resources, and pod allocations, use kubectl describe node <node-name>. The Metrics Server must be installed for the kubectl top commands to work.
+
+### Kubernetes Worker Node Commands
+
+These are the most commonly used commands for troubleshooting and managing a Kubernetes worker node.
+
+1. Check Node Status
+```
+kubectl get nodes
+```
+
+Detailed information:
+
+```
+kubectl describe node <node-name>
+```
+
+Example:
+
+```
+kubectl describe node worker-1
+```
+2. Check Pods Running on a Worker Node
+
+List all pods and their nodes:
+
+```
+kubectl get pods -o wide -A
+```
+
+Find pods running on a specific node:
+
+```
+kubectl get pods -A -o wide | grep worker-1
+```
+3. Check kubelet Status
+
+Verify kubelet service:
+
+```
+systemctl status kubelet
+```
+
+Start kubelet:
+
+```
+systemctl start kubelet
+```
+Restart kubelet:
+
+```
+systemctl restart kubelet
+```
+
+View logs:
+
+```
+journalctl -u kubelet -f
+```
+4. Check Container Runtime
+containerd
+
+Status:
+
+```
+systemctl status containerd
+```
+
+Restart:
+
+```
+systemctl restart containerd
+```
+
+Logs:
+
+```
+journalctl -u containerd -f
+```
+5. Container Runtime Commands (crictl)
+
+List running containers:
+
+```
+crictl ps
+```
+
+List all containers:
+
+```
+crictl ps -a
+```
+
+List images:
+
+```
+crictl images
+```
+
+Inspect container:
+
+```
+
+crictl inspect <container-id>
+```
+
+View logs:
+
+```
+crictl logs <container-id>
+```
+6. Check Node Resources
+
+CPU and Memory:
+
+```
+kubectl top node
+```
+
+Linux level:
+
+```
+top
+```
+```
+htop
+```
+```
+free -h
+```
+```
+df -h
+```
+7. Check CNI Network
+
+View CNI configuration:
+
+```
+ls /etc/cni/net.d/
+```
+
+Check network interfaces:
+
+```
+ip addr
+```
+
+Check routes:
+
+```
+ip route
+```
+
+Verify CNI pods:
+
+```
+kubectl get pods -n kube-system
+```
+8. Check kube-proxy
+
+Find kube-proxy:
+
+```
+kubectl get pods -n kube-system | grep kube-proxy
+```
+
+Logs:
+
+```
+kubectl logs -n kube-system <kube-proxy-pod>
+```
+9. Check Node Events
+```
+kubectl describe node worker-1
+```
+
+View events:
+
+```
+kubectl get events --sort-by=.metadata.creationTimestamp
+```
+10. Node Maintenance Commands
+Cordoning a Node
+
+Prevent new pods from scheduling:
+
+```
+kubectl cordon worker-1
+```
+
+Check:
+
+```
+kubectl get nodes
+```
+
+Output:
+
+```
+worker-1 Ready,SchedulingDisabled
+```
+Uncordon
+```
+kubectl uncordon worker-1
+```
+11. Drain a Node
+
+Safely evict workloads before maintenance:
+
+```
+kubectl drain worker-1 --ignore-daemonsets
+```
+
+After maintenance:
+```
+kubectl uncordon worker-1
+```
+12. Worker Node Troubleshooting Commands
+
+Check node status:
+
+```
+kubectl get nodes
+```
+
+Check pod details:
+
+```
+kubectl describe pod <pod-name>
+```
+
+Check logs:
+
+```
+kubectl logs <pod-name>
+```
+
+Check previous logs:
+
+```
+kubectl logs <pod-name> --previous
+```
+Most Important Interview Commands
+```
+kubectl get nodes
+2
+kubectl describe node <node-name>
+3
+kubectl top node
+4
+systemctl status kubelet
+5
+journalctl -u kubelet -f
+6
+systemctl status containerd
+7
+crictl ps
+8
+kubectl get pods -A -o wide
+9
+kubectl cordon <node-name>
+10
+kubectl drain <node-name> --ignore-daemonsets
+11
+kubectl uncordon <node-name>
+```
+### Interview Answer
+
+On a worker node, I typically check node health using kubectl get nodes and kubectl describe node. I verify kubelet and containerd services using systemctl, inspect containers with crictl, monitor resource utilization with kubectl top node, and use kubectl cordon, drain, and uncordon during maintenance activities. These commands help troubleshoot node, pod, networking, and runtime issues effectively.
