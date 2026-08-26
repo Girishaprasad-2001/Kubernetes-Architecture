@@ -1126,3 +1126,174 @@ or on the control plane node:
 Show more lines
 #### Interview Answer
 Kubernetes controllers are control loops that watch cluster resources and reconcile the current state with the desired state. Common controller types include Deployment, ReplicaSet, StatefulSet, DaemonSet, Job, CronJob, Node Controller, Namespace Controller, and HPA Controller. Most built-in controllers run inside the kube-controller-manager component.
+
+## Kubernetes Pod Lifecycle
+
+A Pod goes through several phases from creation to termination.
+
+Pod Lifecycle Flow
+```
+Pending
+   ↓
+ContainerCreating
+   ↓
+Running
+   ↓
+Succeeded / Failed
+   ↓
+Terminating
+```
+1. Pending
+
+The Pod has been accepted by Kubernetes but one or more containers are not yet running.
+
+Activities:
+
+Pod scheduled to a node
+Images being pulled
+Volumes being mounted
+
+Check:
+```
+kubectl get pods
+```
+Example:
+```
+NAME      READY   STATUS    RESTARTS   AGE
+nginx     0/1     Pending   0          5s
+```
+2. Running
+
+The Pod has been scheduled and at least one container is running.
+
+Example:
+
+```
+NAME      READY   STATUS    RESTARTS   AGE
+nginx     1/1     Running   0          1m
+```
+At this stage:
+
+Containers are running
+Readiness and liveness probes are monitored
+Services can route traffic to the pod (if ready)
+
+3. Succeeded
+
+All containers completed successfully and exited with code 0.
+
+Example:
+
+Backup Job
+Batch processing Job
+```
+STATUS: Succeeded
+```
+4. Failed
+
+One or more containers terminated with an error.
+
+Reasons:
+
+Application crash
+Non-zero exit code
+Image issues
+Resource problems
+```
+STATUS: Failed
+```
+5. Unknown
+
+The Pod state cannot be determined.
+
+Usually occurs when:
+
+Node communication is lost
+Kubelet is unreachable
+```
+STATUS: Unknown
+```
+### Container States Inside a Pod
+
+Apart from Pod phases, containers have their own states:
+
+Waiting
+
+Container is not yet running.
+
+Examples:
+```
+ImagePullBackOff
+ErrImagePull
+CrashLoopBackOff
+ContainerCreating
+```
+Running
+
+Container is executing normally.
+```
+State: Running
+```
+Terminated
+
+Container has stopped.
+```
+State: Terminated
+Reason: Completed
+Exit Code: 0
+```
+Pod Termination Process
+
+When you delete a pod:
+
+```
+kubectl delete pod nginx
+```
+Kubernetes performs:
+
+Marks Pod as Terminating
+Removes pod from service endpoints
+Sends SIGTERM to containers
+Waits for terminationGracePeriodSeconds (default 30 sec)
+Sends SIGKILL if containers don't stop
+Removes Pod object
+
+Pod Conditions
+
+Check using:
+```
+kubectl describe pod <pod-name>
+```
+Common conditions:
+
+PodScheduled → Assigned to a node
+Initialized → Init containers completed
+ContainersReady → All containers ready
+Ready → Pod ready to receive traffic
+
+Example:
+
+```
+Conditions:
+  Initialized       True
+  Ready             True
+  ContainersReady   True
+  PodScheduled      True
+```
+Lifecycle with Init Containers
+```
+Pending
+   ↓
+Init Container 1
+   ↓
+Init Container 2
+   ↓
+Application Container
+   ↓
+Running
+```
+Init containers must complete successfully before application containers start.
+
+### Interview Answer
+
+The Kubernetes Pod lifecycle consists of phases such as Pending, Running, Succeeded, Failed, and Unknown. A pod starts in the Pending state, moves to Running when scheduled and containers start, and eventually ends in Succeeded or Failed. During deletion, it enters the Terminating state, where Kubernetes gracefully shuts down containers using SIGTERM followed by SIGKILL if necessary. Container states include Waiting, Running, and Terminated.
