@@ -1595,3 +1595,385 @@ Service automatically routes traffic to healthy Pods.
 
 A Kubernetes Service provides a stable network endpoint for a group of Pods. The Service uses label selectors to discover Pods created by a Deployment and load-balances traffic among them. The workflow is: Deployment creates Pods → Service selects Pods using labels → Kubernetes creates Endpoints → Users access the application through the Service's ClusterIP, NodePort, or LoadBalancer.
 
+1. ClusterIP (Default)
+
+A ClusterIP service exposes an application only inside the Kubernetes cluster.
+
+Architecture
+```
+Pod A
+  |
+  v
+ClusterIP Service
+  |
+  v
+Pod B
+```
+Example
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  type: ClusterIP
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80
+```
+Access
+```
+curl http://nginx-service
+
+```
+or 
+```
+curl http://10.96.0.10
+```
+✅ Accessible from inside cluster only
+
+❌ Not accessible from Internet
+
+Use Cases
+Backend APIs
+Internal microservices
+Database services
+2. NodePort
+
+A NodePort exposes a service on a static port of every worker node.
+
+Architecture
+```
+Internet
+   |
+   v
+NodeIP:30080
+   |
+   v
+NodePort Service
+   |
+   v
+Pod
+```
+Example
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-nodeport
+spec:
+  type: NodePort
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080
+```
+Access
+```
+http://<Node-IP>:30080
+```
+Example:
+```
+http://192.168.1.100:30080
+```
+NodePort Range
+
+Default:
+```
+30000 - 32767
+```
+Use Cases
+Development environments
+Testing
+Small on-prem clusters
+Advantages
+
+✅ External access possible
+
+Disadvantages
+
+❌ Need node IP and port
+
+❌ Not ideal for production
+3. LoadBalancer
+
+A LoadBalancer service provisions a cloud load balancer and exposes the application to external users.
+
+Architecture
+```
+Users
+  |
+  v
+Cloud Load Balancer
+  |
+  v
+K8s Service
+  |
+  v
+Pods
+```
+Example
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-lb
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80
+```
+Access
+```
+http://<External-IP>
+Example:
+http://52.12.34.56
+```
+Cloud Providers
+AWS ELB/NLB
+Azure Load Balancer
+Google Cloud Load Balancer
+Advantages
+
+✅ Production ready
+
+✅ Automatic load balancing
+
+✅ High availability
+
+✅ Public IP assigned
+
+Disadvantages
+
+❌ Additional cloud cost
+
+Use Cases
+Production web applications
+APIs
+Public-facing services
+4. ExternalName
+
+An ExternalName service does not route traffic to Pods.
+
+Instead, it maps a Kubernetes service name to an external DNS name.
+
+Architecture
+```
+Application
+    |
+    v
+ExternalName Service
+    |
+    v
+external-db.company.com
+```
+Example
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-db
+spec:
+  type: ExternalName
+  externalName: mydb.company.com
+```
+Access
+
+Application uses:
+```
+external-db.default.svc.cluster.local
+```
+Kubernetes resolves it to:
+```
+mydb.company.com
+```
+Use Cases
+External databases
+SaaS integrations
+Legacy systems
+Advantages
+
+✅ No proxying
+
+✅ Simple DNS mapping
+
+✅ Easy migration
+
+https://charleswan111.medium.com/kubernetes-services-explained-clusterip-vs-nodeport-vs-loadbalancer-vs-externalname-b540394ef5f4
+https://rtfm.co.ua/en/kubernetes-clusterip-vs-nodeport-vs-loadbalancer-services-and-ingress-an-overview-with-examples/
+
+## What is a Service Mesh?
+
+A Service Mesh is a dedicated infrastructure layer that manages communication between microservices.
+
+It handles:
+
+Service-to-service communication
+Traffic management
+Security (mTLS)
+Monitoring and observability
+Load balancing
+Retry and circuit breaking
+
+Without changing application code.
+### What is Istio?
+
+Istio is one of the most popular Service Mesh implementations for Kubernetes.
+
+It adds a sidecar proxy (Envoy) alongside each application pod.
+```
++-------------------+
+| Application Pod   |
+|                   |
+| App Container     |
+| Envoy Proxy       |
++-------------------+
+```
+All inbound and outbound traffic passes through Envoy.
+## Istio Architecture
+```
+                 Istio Control Plane
+                      (istiod)
+                           |
+                           |
+      -----------------------------------------
+      |                                       |
++---------------+                    +---------------+
+| Pod A         |                    | Pod B         |
+| App           | <--------------->  | App           |
+| Envoy Sidecar |                    | Envoy Sidecar |
++---------------+                    +---------------+
+```
+Components
+1. Istiod (Control Plane)
+
+Responsible for:
+
+Service discovery
+Configuration management
+Certificate management
+Traffic policies
+2. Envoy Proxy (Data Plane)
+
+Handles:
+
+Routing
+Load balancing
+TLS encryption
+Metrics collection
+
+#### Key Features of Istio
+Traffic Management
+
+Can route traffic between versions.
+
+Example:
+```
+90% → v1
+10% → v2
+```
+Useful for:
+
+Canary deployments
+Blue-Green deployments
+A/B testing
+Security (mTLS)
+Encrypts pod-to-pod communication automatically.
+```
+Service A
+   ⇄
+mTLS
+   ⇄
+Service B
+```
+Benefits:
+
+Encryption
+Authentication
+Authorization
+Observability
+
+Integrates with:
+
+Prometheus
+Grafana
+Jaeger
+Kiali
+
+Provides:
+
+Latency
+Error rates
+Traffic flow
+Distributed tracing
+Traffic Resiliency
+
+Supports:
+
+Retries
+Timeout
+Circuit breaking
+Fault injection
+
+Example:
+```
+retries:
+  attempts: 3
+```
+### How Istio Works
+Step 1
+
+Application sends request.
+```
+App A
+  ↓
+Envoy A
+```
+Step 2
+
+Envoy applies policies.
+```
+Security
+Routing
+Observability
+```
+Step 3
+
+Request forwarded.
+```
+Envoy A → Envoy B
+```
+Step 4
+
+Destination service receives request.
+```
+Envoy B → App B
+```
+
+### Why Use Istio?
+### Without Istio
+
+Every application must implement:
+
+TLS
+Retries
+Monitoring
+Load balancing
+With Istio
+
+These capabilities are provided by the service mesh.
+```
+Application Logic
++
+Istio Service Mesh
+```
+### Interview Answer
+
+A Service Mesh is an infrastructure layer that manages service-to-service communication in a microservices environment. Istio is a popular Service Mesh for Kubernetes that uses Envoy sidecar proxies and the Istiod control plane. It provides traffic management, mTLS security, observability, load balancing, retries, circuit breaking, and canary deployments without requiring changes to application code.
