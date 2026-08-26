@@ -544,3 +544,531 @@ terraform providers
 ### 2-Minute Interview Answer
 
 Terraform commands follow a typical workflow. terraform init initializes the project and downloads providers. terraform validate checks syntax, terraform fmt formats code, and terraform plan shows the changes Terraform will make. terraform apply provisions infrastructure, while terraform destroy removes it. State management commands such as terraform state list, terraform state show, and terraform import help manage existing resources. Workspaces are used to separate environments like dev, test, and prod. These commands form the core Terraform lifecycle used in real-world DevOps and cloud automation projects.
+
+
+# Terraform Import, Data Source, Module, and Taint - Complete Explanation
+
+These are common Terraform interview topics and are often asked together.
+
+1. Terraform Import
+What is Terraform Import?
+
+terraform import is used to bring an existing resource into Terraform state without recreating it.
+
+Scenario
+
+An EC2 instance already exists in AWS.
+
+```
+AWS EC2 Instance
+2
+↓
+3
+Created Manually
+4
+↓
+5
+Terraform doesn't know about it
+```
+
+Use import:
+
+```
+terraform import aws_instance.web i-0123456789abcdef0
+```
+
+Now Terraform manages it.
+
+Example
+Resource Block
+Terraform
+```
+1
+resource "aws_instance" "web" {
+2
+}
+```
+Import
+```
+terraform import aws_instance.web i-0123456789abcdef0
+```
+Verify
+```
+terraform state list
+```
+```
+terraform state show aws_instance.web
+```
+Workflow
+```
+Existing Resource
+2
+↓
+3
+terraform import
+4
+↓
+5
+Terraform State
+6
+↓
+7
+Managed by Terraform
+```
+Important Points
+Resource already exists.
+Terraform adds it to state.
+Does NOT generate complete Terraform code.
+After import, update configuration manually.
+Import Block (Terraform 1.5+)
+
+Instead of CLI:
+
+Terraform
+```
+1
+import {
+2
+to = aws_instance.web
+3
+id = "i-0123456789abcdef0"
+4
+}
+```
+
+Run:
+
+```
+terraform apply
+```
+# Interview Answer
+
+Terraform Import is used to bring existing infrastructure under Terraform management by associating a real-world resource with a Terraform resource block and storing that mapping in the state file.
+
+## 2. Terraform Data Source
+What is a Data Source?
+
+A data source allows Terraform to read information about existing resources without managing them.
+
+Syntax
+Terraform
+```
+1
+data "<provider>_<resource>" "<name>" {
+2
+}
+```
+Example: Existing VPC
+Terraform
+```
+1
+data "aws_vpc" "prod" {
+2
+id = "vpc-123456"
+3
+}
+```
+
+Use it:
+
+Terraform
+```
+1
+resource "aws_subnet" "subnet1" {
+2
+vpc_id = data.aws_vpc.prod.id
+3
+cidr_block = "10.0.1.0/24"
+4
+}
+```
+Workflow
+```
+Existing VPC
+2
+↓
+3
+Data Source Reads It
+4
+↓
+5
+Terraform Uses Attributes
+```
+Characteristics
+
+✅ Read-only
+
+✅ No resource creation
+
+✅ No deletion
+
+✅ No lifecycle management
+
+Data Source vs Import
+Data Source
+Terraform
+```
+1
+data "aws_vpc" "prod" {
+2
+id = "vpc-123456"
+3
+}
+```
+
+Purpose:
+
+```
+Read Existing Resource
+```
+
+Terraform can't destroy it.
+
+Import
+Terraform
+```
+1
+resource "aws_vpc" "prod" {
+2
+}
+3
+ 
+```
+```
+terraform import aws_vpc.prod vpc-123456
+```
+
+Purpose:
+
+```
+Manage Existing Resource
+2
+``
+```
+
+Terraform can modify or destroy it.
+
+Comparison
+Feature	Data Source	ImportCreate Resource	No	No
+Read Resource	Yes	Yes
+Manage Lifecycle	No	Yes
+Stored in State	Temporary Read	Managed Resource
+Destroy Possible	No	Yes
+
+## 3. Terraform Module
+What is a Module?
+
+A module is a reusable collection of Terraform resources.
+
+Without Module
+```
+VPC.tf
+2
+Subnet.tf
+3
+EC2.tf
+4
+ 
+5
+Repeated Again
+6
+Repeated Again
+7
+Repeated Again
+```
+
+Lots of duplication.
+
+With Module
+```
+Module Created Once
+2
+↓
+3
+Reuse Multiple Times
+```
+Root Module
+```
+main.tf
+```
+
+Terraform execution starts here.
+
+Child Module Structure
+```
+modules/
+2
+└── ec2/
+3
+├── main.tf
+4
+├── variables.tf
+5
+└── outputs.tf
+```
+Child Module Example
+main.tf
+Terraform
+```
+1
+resource "aws_instance" "server" {
+2
+ami = var.ami
+3
+instance_type = var.instance_type
+4
+}
+```
+variables.tf
+Terraform
+```
+1
+variable "ami" {}
+2
+ 
+3
+variable "instance_type" {}
+```
+outputs.tf
+Terraform
+```
+1
+output "instance_id" {
+2
+value = aws_instance.server.id
+3
+}
+```
+Call Module
+Root Module
+Terraform
+```
+1
+module "webserver" {
+2
+source = "./modules/ec2"
+3
+ 
+4
+ami = "ami-0abc1234"
+5
+instance_type = "t2.micro"
+6
+}
+```
+
+Apply:
+
+```
+terraform apply
+```
+Module Workflow
+```
+Root Module
+2
+↓
+3
+Calls Child Module
+4
+↓
+5
+Creates Resources
+```
+Types of Modules
+Local Module
+Terraform
+```
+1
+source = "./modules/ec2"
+```
+Git Module
+Terraform
+```
+1
+source = "git::https://github.com/org/modules.git//ec2"
+```
+Registry Module
+Terraform
+```
+1
+source = "terraform-aws-modules/vpc/aws"
+```
+Benefits
+Reusability
+Standardization
+Easier maintenance
+Scalability
+## 4. Terraform Taint
+What is Taint?
+
+Taint marks a resource as damaged or requiring recreation.
+
+Next Apply:
+
+```
+Destroy Old Resource
+2
+↓
+3
+Create New Resource
+```
+Example
+
+EC2 state:
+```
+aws_instance.web
+```
+
+Mark resource:
+
+```
+terraform taint aws_instance.web
+```
+
+Output:
+
+```
+Resource marked as tainted
+```
+
+Run:
+
+```
+terraform apply
+```
+Terraform:
+
+```
+Destroy EC2
+2
+Create New EC2
+3
+ 
+```
+Workflow
+```
+Resource Problem
+2
+↓
+3
+terraform taint
+4
+↓
+5
+Marked for Recreation
+6
+↓
+7
+terraform apply
+8
+↓
+9
+New Resource Created
+```
+Untaint
+
+Remove taint:
+
+```
+terraform untaint aws_instance.web
+```
+Modern Replacement (Terraform 0.15+)
+
+HashiCorp recommends:
+
+```
+terraform apply -replace="aws_instance.web"
+2
+
+```
+
+Example:
+
+```
+terraform apply -replace="aws_instance.web"
+```
+
+Terraform Plan:
+
+```
+-/+ aws_instance.web
+```
+
+Meaning:
+
+```
+Destroy
+2
+Create
+3
+ 
+```
+Taint vs Replace
+Old Method
+```
+terraform taint aws_instance.web
+2
+terraform apply
+3
+ 
+```
+
+Two-step process.
+
+New Method
+```
+terraform apply -replace="aws_instance.web"
+```
+
+One-step process.
+
+Preferred in newer Terraform versions.
+
+Real-Time Example
+
+Suppose:
+
+```
+AWS EC2
+```
+
+Problems:
+
+Corrupted OS
+Wrong software installation
+Provisioner failed
+
+Instead of manually deleting:
+
+```
+terraform apply -replace="aws_instance.web"
+```
+
+Terraform:
+
+```
+Delete Old EC2
+2
+Create New EC2
+3
+Update State
+```
+
+Automatically.
+
+# Interview Summary
+## Terraform Import
+
+Used to bring existing resources under Terraform management by adding them to the Terraform state.
+
+## Data Source
+
+Used to read information about existing infrastructure without managing it.
+
+## Module
+
+A reusable collection of Terraform configurations used to standardize and simplify infrastructure deployment.
+
+## Taint / Replace
+
+Used to force Terraform to recreate a resource. terraform taint is the older method, while terraform apply -replace is the recommended modern approach.
