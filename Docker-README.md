@@ -1475,11 +1475,11 @@ ENTRYPOINT ["java","-jar","app.jar"]
 
 ## For a Java application, a Docker multi-stage build can have dedicated stages such as:
 
-AS build → Download dependencies
-AS compile → Compile source code
-AS testing → Run unit tests
-AS builder → Package JAR/WAR
-AS runner → Lightweight runtime image
+1. AS build → Download dependencies.
+2. AS compile → Compile source code.
+3. AS testing → Run unit tests.
+4. AS builder → Package JAR/WAR.
+5. AS runner → Lightweight runtime image.
 
 Example: Maven-based Spring Boot Application
 
