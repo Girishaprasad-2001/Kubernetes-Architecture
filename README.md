@@ -1412,3 +1412,185 @@ kubectl apply -f deployment.yaml
 ### Interview Answer
 
 A deployment.yaml file defines a Kubernetes Deployment resource. It specifies the application image, number of replicas, labels, selectors, and container configuration. When applied using kubectl apply -f deployment.yaml, Kubernetes creates a Deployment, which manages a ReplicaSet, and the ReplicaSet creates and maintains the required number of Pods.
+
+### Kubernetes Service YAML Workflow
+
+A Service in Kubernetes provides a stable IP/DNS name to access Pods. Since Pods can be created and destroyed frequently, Services act as a consistent endpoint.
+
+Workflow
+```
+deployment.yaml
+      ↓
+Deployment
+      ↓
+ReplicaSet
+      ↓
+Pods (Dynamic IPs)
+      ↓
+Service
+      ↓
+Stable Cluster IP / External IP
+      ↓
+Users or Applications
+```
+1. Create Deployment
+
+deployment.yaml
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+```
+Apply:
+```
+kubectl apply -f deployment.yaml
+```
+Check Pods:
+```
+kubectl get pods
+```
+2. Create Service
+
+service.yaml
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+
+spec:
+  selector:
+    app: nginx
+
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+
+  type: ClusterIP
+```
+Apply:
+```
+kubectl apply -f service.yaml
+```
+3. How Service Finds Pods
+
+Service uses the selector:
+```
+selector:
+  app: nginx
+```
+Pod labels:
+```
+labels:
+  app: nginx
+```
+Kubernetes automatically creates endpoints:
+```
+Service
+   ↓
+app=nginx
+   ↓
+Pod1
+Pod2
+Pod3
+4. Verify Service
+
+View Service:
+
+```
+kubectl get svc
+
+```
+```
+NAME            TYPE        CLUSTER-IP      PORT(S)
+nginx-service   ClusterIP   10.96.45.123   80/TCP
+```
+View Endpoints:
+```
+kubectl get endpoints
+```
+Output:
+```
+NAME            ENDPOINTS
+nginx-service   10.244.0.5:80,10.244.0.6:80
+```
+Service Types
+ClusterIP (Default)
+
+Internal access only.
+```
+type: ClusterIP
+```
+NodePort
+
+Accessible through:
+```
+<NodeIP>:30080
+```
+```
+type: NodePort
+
+ports:
+- port: 80
+  targetPort: 80
+  nodePort: 30080
+
+```
+LoadBalancer
+
+Creates a cloud load balancer.
+```
+type: LoadBalancer
+```
+AWS, Azure, and GCP assign an external IP.
+
+### ExternalName
+
+Maps a Kubernetes Service to an external DNS name.
+
+```
+type: ExternalName
+externalName: google.com
+```
+End-to-End Example.
+```
+User Request
+      ↓
+LoadBalancer Service
+      ↓
+ClusterIP Service
+      ↓
+Pod 1
+Pod 2
+Pod 3
+```
+If Pod 1 crashes:
+```
+Pod 1 ❌
+Pod 2 ✅
+Pod 3 ✅
+```
+Service automatically routes traffic to healthy Pods.
+
+### Interview Answer
+
+A Kubernetes Service provides a stable network endpoint for a group of Pods. The Service uses label selectors to discover Pods created by a Deployment and load-balances traffic among them. The workflow is: Deployment creates Pods → Service selects Pods using labels → Kubernetes creates Endpoints → Users access the application through the Service's ClusterIP, NodePort, or LoadBalancer.
+
