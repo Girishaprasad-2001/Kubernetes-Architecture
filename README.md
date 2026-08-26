@@ -44,33 +44,6 @@ Worker Nodes maintain running pods and provide the actual Kubernetes runtime env
 * **kube-proxy**: A network proxy that runs on each node, maintaining network rules to allow network communication to your Pods.
 * **Pods**: The smallest deployable units of computing that you can create and manage in Kubernetes. They host your containerized applications.
 
-### Kubernetes Architecture
-
-Kubernetes architecture consists of a Control Plane and Worker Nodes. 
-
-+-----------------------------------+
-
-|           Control Plane           |
-|  +-----------------------------+  |
-|  | API Server                  |  |
-|  | Scheduler                   |  |
-|  | Controller Manager          |  |
-|  | etcd                        |  |
-|  +-----------------------------+  |
-+-----------------------------------+
-                  |
-        +---------+---------+
-
-        |                   |
-+---------------+   +---------------+
-
-|  Worker Node  |   |  Worker Node  |
-|  +---------+  |   |  +---------+  |
-|  | kubelet |  |   |  | kubelet |  |
-|  | proxy   |  |   |  | proxy   |  |
-|  | Pods    |  |   |  | Pods    |  |
-|  +---------+  |   |  +---------+  |
-+---------------+   +---------------+
 
 ### 1. Control Plane Components
 
@@ -127,13 +100,14 @@ Responsible for running containers. 
 
 ### 3. Pods
 
-Smallest deployable unit in Kubernetes. One or more containers share: 
+Smallest deployable unit in Kubernetes. 
+One or more containers share: 
 
 * Network namespace
 * Storage volumes
 
 **Example:** 
-
+```
 yaml
 
 apiVersion: v1
@@ -144,17 +118,17 @@ spec:
   containers:
   - name: nginx
     image: nginx
-
+```
 Use code with caution.
 
 ### Request Flow Example
 
 When you run: 
-
+```
 bash
 
 kubectl apply -f deployment.yaml
-
+```
 Use code with caution.
 
 1. Request goes to API Server.
