@@ -1297,3 +1297,118 @@ Init containers must complete successfully before application containers start.
 ### Interview Answer
 
 The Kubernetes Pod lifecycle consists of phases such as Pending, Running, Succeeded, Failed, and Unknown. A pod starts in the Pending state, moves to Running when scheduled and containers start, and eventually ends in Succeeded or Failed. During deletion, it enters the Terminating state, where Kubernetes gracefully shuts down containers using SIGTERM followed by SIGKILL if necessary. Container states include Waiting, Running, and Terminated.
+
+### A deployment.yaml file is used to create and manage applications in Kubernetes using a Deployment resource.
+
+Step 1: Create deployment.yaml
+
+Example for an Nginx application:
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+
+  selector:
+    matchLabels:
+      app: nginx
+
+  template:
+    metadata:
+      labels:
+        app: nginx
+
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+```
+Step 2: Apply the Deployment
+```
+kubectl apply -f deployment.yaml
+```
+Output:
+```
+deployment.apps/nginx-deployment created
+```
+Step 3: Verify Deployment
+
+Check deployment:
+```
+kubectl get deployment
+```
+Check ReplicaSets:
+```
+kubectl get rs
+```
+Check Pods:
+```
+kubectl get pods
+```
+How Deployment Creates Pods
+
+When you apply the file:
+```
+Deployment
+    ↓
+ReplicaSet
+    ↓
+Pods
+```
+For example, with:
+```
+replicas: 3
+```
+Kubernetes creates:
+```
+Deployment (nginx-deployment)
+       ↓
+ReplicaSet
+       ↓
+3 Nginx Pods
+```
+Useful Commands
+
+View deployment details:
+
+```
+kubectl describe deployment nginx-deployment
+```
+Scale deployment:
+```
+kubectl scale deployment nginx-deployment --replicas=5
+```
+Update image:
+
+```
+kubectl set image deployment/nginx-deployment nginx=nginx:1.25
+```
+Check rollout status:
+```
+kubectl rollout status deployment/nginx-deployment
+
+```
+Rollback:
+```
+kubectl rollout undo deployment/nginx-deployment
+```
+#### Generate a Deployment YAML Automatically
+
+You can generate a starter YAML without creating the deployment:
+```
+kubectl create deployment nginx \
+  --image=nginx \
+  --dry-run=client -o yaml > deployment.yaml
+```
+Then edit the file as needed and apply it:
+
+```
+kubectl apply -f deployment.yaml
+```
+### Interview Answer
+
+A deployment.yaml file defines a Kubernetes Deployment resource. It specifies the application image, number of replicas, labels, selectors, and container configuration. When applied using kubectl apply -f deployment.yaml, Kubernetes creates a Deployment, which manages a ReplicaSet, and the ReplicaSet creates and maintains the required number of Pods.
