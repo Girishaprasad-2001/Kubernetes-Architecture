@@ -821,6 +821,7 @@ Create Interfaces
 Example:
 eth0
 inside pod.
+
 Step 9: Start Application Container
 
 containerd creates:
@@ -884,6 +885,7 @@ spec:
   - port: 80
 ```
 Workflow:
+```
 Client
   |
   v
@@ -897,13 +899,14 @@ Pod IP
   |
   v
 nginx Pod
-
+```
 kube-proxy updates iptables/IPVS rules and forwards traffic.
 ### What Happens When Pod Is Deleted?
 ```
 kubectl delete pod nginx-pod
 ```
 Flow:
+```
 API Server
      |
      v
@@ -914,7 +917,7 @@ containerd stops container
 CNI releases IP
      |
 Pod removed
-
+```
 ## Components Involved in Interview Order
 Control Plane
 API Server
