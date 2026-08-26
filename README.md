@@ -699,5 +699,235 @@ Worker Node
          |
          v
        Running Pod
+```
+Step 1: User Sends Request
+```
+kubectl apply -f nginx-pod.yaml
+```
+kubectl sends the Pod manifest to the API Server.
+
+Step 2: API Server
+
+Responsibilities:
+
+Authenticates user
+Validates YAML
+Checks RBAC
+Accepts request
+
+Example:
+``` kubectl --> API Server ```
+After validation, the Pod object is created.
+Step 3: Store in etcd
+
+The API Server stores the desired state in:
+``` etcd```
+Example entry:
+```
+Pod Name : nginx-pod
+Status   : Pending
+Node     : None
+```
+At this stage:
+```
+kubectl get pods
+```
+```
+nginx-pod   Pending
+```
+Step 4: Scheduler Selects Node
+
+Scheduler continuously watches for Pods with:
+```
+nodeName = null
+```
+Checks:
+
+CPU availability
+Memory availability
+Affinity rules
+Taints/Tolerations
+
+Suppose Node-2 is selected:
+```
+nginx-pod --> worker-node-2
+```
+Scheduler updates the Pod object.
+Step 5: kubelet Receives Assignment
+
+On worker-node-2:
+``` kubelet ```
+detects:
+A new pod is assigned to me
+
+kubelet starts Pod creation.
+
+Step 6: Container Runtime Pulls Image
+
+kubelet contacts containerd:
+``` kubelet ---> containerd``` 
+containerd executes:
+```
+docker pull nginx:latest
+```
+(Internally containerd pulls from Docker Hub.)
+
+If image already exists:
+
+Uses local cache
+
+Step 7: Create Pod Sandbox
+
+Container Runtime creates:
+Pause Container
+
+Example:
+```
+nginx-pod
+ |
+ +-- pause container
+ +-- nginx container
+```
+Purpose:
+
+Holds Pod network namespace
+Holds Pod IP
+
+Verify:
+```
+crictl ps
+```
+Step 8: CNI Plugin Executes
+
+Now kubelet calls the CNI plugin.
+
+Examples:
+
+Calico
+Cilium
+Flannel
+
+Tasks:
+
+Assign IP
+
+Example:
+``` 10.244.1.25``` 
+Configure Routes
+
+Pod A ---> Pod B
+Create Interfaces
+
+Example:
+eth0
+inside pod.
+Step 9: Start Application Container
+
+containerd creates:
 
 ```
+nginx container
+```
+using image:
+``` nginx:latest ```
+Process starts:
+
+nginx master process
+Step 10: Health Checks
+
+If configured:
+```
+livenessProbe:
+readinessProbe:
+startupProbe:
+```
+kubelet runs them.
+
+Example:
+```
+readinessProbe:
+  httpGet:
+    path: /
+    port: 80
+```
+Result:
+Ready = True
+
+Step 11: Pod Running
+
+Status changes:
+```
+Pending
+   |
+ContainerCreating
+   |
+Running
+```
+kubectl get pods
+
+```
+NAME        READY   STATUS
+nginx-pod   1/1     Running
+```
+## Service Access Workflow
+
+Create Service:
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  ports:
+  - port: 80
+```
+Workflow:
+Client
+  |
+  v
+Service IP
+  |
+  v
+kube-proxy
+  |
+  v
+Pod IP
+  |
+  v
+nginx Pod
+
+kube-proxy updates iptables/IPVS rules and forwards traffic.
+### What Happens When Pod Is Deleted?
+```
+kubectl delete pod nginx-pod
+```
+Flow:
+API Server
+     |
+     v
+kubelet
+     |
+containerd stops container
+     |
+CNI releases IP
+     |
+Pod removed
+
+## Components Involved in Interview Order
+Control Plane
+API Server
+etcd
+Scheduler
+Controller Manager
+Worker Node
+kubelet
+Container Runtime (containerd/CRI-O)
+CNI Plugin (Calico/Cilium/Flannel)
+kube-proxy
+Pod Containers
+
+#### 2-Minute Interview Answer
+
+When a Pod is created, kubectl sends the manifest to the API Server. The API Server validates the request and stores it in etcd. The Scheduler selects a suitable worker node and assigns the Pod. The kubelet on that node receives the assignment and instructs the container runtime (containerd/CRI-O) to pull the image and create the Pod sandbox. The CNI plugin configures networking and assigns a Pod IP. The application container starts, health checks are performed, and the Pod reaches the Running state. If a Service is present, kube-proxy routes traffic to the Pod.
