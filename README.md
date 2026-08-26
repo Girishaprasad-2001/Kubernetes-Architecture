@@ -311,7 +311,6 @@ Docker allows overriding ENTRYPOINT:
 
 ```
 docker run --entrypoint /bin/bash myimage
-
 ```
 
 This starts Bash instead of the image's configured ENTRYPOINT.
