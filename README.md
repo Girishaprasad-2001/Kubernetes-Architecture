@@ -262,6 +262,7 @@ Here, hello is passed as an argument to the ENTRYPOINT command.
 ### CMD + ENTRYPOINT Together
 
 This is the most common pattern.
+
 ```
 FROM ubuntu
 
@@ -269,22 +270,28 @@ ENTRYPOINT ["echo"]
 CMD ["Hello World"]
 ```
 Run:
+
 ```
 docker run myimage
 ```
 Output:
+
 ```
 Hello World
 ```
 Override CMD:
+
 ```
 docker run myimage Kubernetes
 ```
+
 Output:
+
 ```
 Kubernetes
 ```
 Docker executes:
+
 ```
 echo Kubernetes
 ```
