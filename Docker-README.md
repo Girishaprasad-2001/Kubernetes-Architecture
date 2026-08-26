@@ -631,3 +631,791 @@ docker volume ls
 ## 2-Minute Interview Answer
 
 Docker is a containerization platform used to package applications and their dependencies into portable containers. Common commands include docker pull for downloading images, docker run for creating containers, docker ps for listing containers, docker logs for troubleshooting, docker exec for accessing running containers, docker build for creating custom images, and docker push for uploading images to registries. Docker volumes provide persistent storage, while Docker networks enable communication between containers. These commands are used daily in CI/CD, Kubernetes, and cloud-native environments.
+
+# Dockerfile Complete Guide (Interview + Practical Knowledge)
+
+A Dockerfile is a text file containing instructions to build a Docker Image.
+
+Flow:
+```
+Dockerfile
+    ↓
+docker build
+    ↓
+Docker Image
+    ↓
+docker run
+    ↓
+Container
+```
+### Example:
+
+Dockerfile
+```
+FROM ubuntu:22.04
+
+RUN apt-get update
+
+CMD ["echo","Hello World"]
+```
+
+Build:
+
+```
+docker build -t myimage .
+```
+
+Run:
+
+```
+docker run myimage
+2
+ 
+```
+Dockerfile Structure
+
+Most common instructions:
+
+Dockerfile
+```
+FROM
+LABEL
+WORKDIR
+COPY
+ADD
+RUN
+ENV
+ARG
+EXPOSE
+VOLUME
+USER
+ENTRYPOINT
+CMD
+HEALTHCHECK
+```
+
+
+Let's understand each one.
+
+## 1. FROM
+
+Defines the base image.
+
+Dockerfile
+```
+1
+FROM ubuntu:22.04
+```
+
+or
+
+Dockerfile
+```
+1
+FROM nginx:latest
+```
+
+Every Dockerfile must start with FROM.
+
+Example
+Dockerfile
+```
+1
+FROM python:3.11
+```
+
+This image already contains:
+
+```
+Linux OS
++
+Python 3.11
++
+Required libraries
+```
+## 2. LABEL
+
+Adds metadata to an image.
+
+Dockerfile
+```
+LABEL maintainer="reddy@example.com"
+2
+LABEL version="1.0"
+3
+ 
+```
+
+Check:
+
+```
+docker inspect image_name
+```
+Usage
+Dockerfile
+```
+1
+LABEL project="Ecommerce"
+2
+LABEL author="Reddy"
+```
+## 3. WORKDIR
+
+Sets the working directory.
+
+Without WORKDIR:
+
+Dockerfile
+```
+1
+RUN mkdir /app
+2
+RUN cd /app
+```
+
+This doesn't persist between layers.
+
+Better:
+
+Dockerfile
+```
+1
+WORKDIR /app
+```
+
+Now all commands run from:
+
+```
+/app
+```
+
+Example:
+
+Dockerfile
+```
+1
+WORKDIR /application
+2
+ 
+```
+
+### 4. COPY
+
+Copies files from local machine to image.
+
+Dockerfile
+```
+1
+COPY source destination
+```
+
+Example:
+
+Dockerfile
+```
+1
+COPY app.py /app/
+2
+```
+
+Copy everything:
+
+Dockerfile
+```
+1
+COPY . .
+2
+ 
+```
+Workflow
+```
+Local Files
+      ↓
+   COPY
+      ↓
+Docker Image
+```
+
+## 5. ADD
+
+Similar to COPY but with extra features.
+
+Dockerfile
+```
+1
+ADD file.tar.gz /app
+```
+
+Automatically extracts:
+
+```
+file.tar.gz
+   ↓
+Extracted
+   ↓
+/app
+```
+
+Can also use URLs.
+
+Dockerfile
+```
+1
+ADD https://example.com/file.txt /tmp/
+```
+Difference: COPY vs ADD
+COPY
+Dockerfile
+```
+1
+COPY app.py /app
+```
+
+Only copies files.
+
+ADD
+Dockerfile
+```
+1
+ADD app.tar.gz /app
+```
+
+Can:
+Extract tar files
+Download URLs
+## Interview Answer
+
+Use COPY whenever possible. ADD only when you need archive extraction or URL downloading.
+
+### 6. RUN
+
+Executes commands during image build.
+
+Dockerfile
+```
+1
+RUN apt-get update
+2
+ 
+```
+
+Example:
+
+Dockerfile
+```
+1
+RUN apt-get update && \
+2
+apt-get install -y curl
+```
+Workflow
+```
+docker build
+     ↓
+RUN executes
+     ↓
+New Image Layer created
+
+Every RUN creates a new layer.
+```
+### 7. ENV
+
+Sets environment variables.
+
+Dockerfile
+```
+1
+ENV APP_ENV=production
+2
+```
+
+Example:
+
+Dockerfile
+```
+1
+ENV JAVA_HOME=/usr/lib/jvm/java-17
+```
+
+Use:
+
+Dockerfile
+```
+1
+RUN echo $JAVA_HOME
+```
+
+Container uses:
+
+```
+echo $JAVA_HOME
+```
+## 8. ARG
+
+Build-time variable.
+
+Dockerfile
+```
+1
+ARG VERSION=1.0
+```
+
+Build:
+
+```
+docker build --build-arg VERSION=2.0 .
+```
+Difference: ARG vs ENV
+
+ARG:
+
+Dockerfile
+```
+1
+ARG VERSION
+```
+Available only during build.
+Not available inside running container.
+
+ENV:
+
+Dockerfile
+```
+1
+ENV VERSION=1.0
+```
+Available during build.
+Available inside container.
+## 9. EXPOSE
+
+Documents container port.
+
+Dockerfile
+```
+1
+EXPOSE 80
+```
+
+Example:
+
+Dockerfile
+```
+1
+EXPOSE 8080
+```
+
+Does NOT publish port automatically.
+
+Need:
+
+```
+docker run -p 8080:8080 image
+```
+Difference
+
+EXPOSE:
+
+Dockerfile
+```
+1
+EXPOSE 80
+2
+ 
+```
+
+Just documentation.
+
+Port Mapping:
+```
+docker run -p 80:80 image
+```
+
+Actually opens the port.
+
+10. VOLUME
+
+Creates persistent storage.
+
+Dockerfile
+```
+1
+VOLUME ["/data"]
+```
+
+Example:
+
+Dockerfile
+```
+1
+VOLUME ["/var/lib/mysql"]
+```
+Workflow
+```
+Container
+    ↓
+Writes Data
+    ↓
+Volume
+    ↓
+Persists after Container Delete
+```
+### 11. USER
+
+Specifies which user runs container.
+
+Default:
+
+```
+root
+```
+
+Example:
+
+Dockerfile
+```
+1
+RUN useradd appuser
+2
+ 
+3
+USER appuser
+4
+ 
+```
+
+Security best practice:
+
+Dockerfile
+```
+1
+USER 1001
+```
+12. CMD
+
+Default command executed when container starts.
+
+Dockerfile
+```
+1
+CMD ["nginx","-g","daemon off;"]
+```
+
+Example:
+
+Dockerfile
+```
+1
+CMD ["python","app.py"]
+```
+
+Override:
+
+```
+docker run image bash
+```
+
+CMD gets replaced.
+
+## 13. ENTRYPOINT
+
+Sets a fixed executable.
+
+Dockerfile
+```
+1
+ENTRYPOINT ["python"]
+```
+
+Run:
+
+```
+docker run image app.py
+2
+ 
+```
+
+Docker executes:
+
+```
+python app.py
+```
+Difference: CMD vs ENTRYPOINT
+CMD
+Dockerfile
+```
+1
+CMD ["echo","hello"]
+```
+
+Can be completely overridden.
+
+```
+docker run image ls
+```
+
+Output:
+
+```
+ls
+```
+ENTRYPOINT
+Dockerfile
+```
+1
+ENTRYPOINT ["echo"]
+```
+
+Run:
+
+```
+docker run image hello
+```
+
+Output:
+
+```
+hello
+```
+
+hello is appended.
+
+Best Practice
+Dockerfile
+1
+ENTRYPOINT ["python"]
+2
+CMD ["app.py"]
+```
+
+Run:
+
+```
+docker run image
+2
+ 
+```
+
+Executes:
+
+```
+python app.py
+```
+
+Override CMD:
+
+```
+docker run image test.py
+```
+
+Executes:
+
+```
+python test.py
+```
+14. HEALTHCHECK
+
+Checks container health.
+
+Dockerfile
+```
+1
+HEALTHCHECK CMD curl -f http://localhost || exit 1
+```
+
+States:
+
+```
+starting
+2
+healthy
+3
+unhealthy
+```
+
+Check:
+
+```
+docker ps
+```
+
+or
+
+```
+docker inspect container
+```
+Multi-Stage Build
+
+Used to reduce image size.
+
+Without Multi-stage
+Dockerfile
+1
+FROM golang:1.22
+2
+ 
+3
+COPY . .
+4
+ 
+5
+RUN go build app
+Show more lines
+
+Image becomes large.
+
+Multi-stage
+Dockerfile
+1
+FROM golang:1.22 AS builder
+2
+ 
+3
+WORKDIR /app
+4
+ 
+5
+COPY . .
+6
+ 
+7
+RUN go build -o app
+8
+ 
+9
+FROM ubuntu:22.04
+10
+ 
+11
+COPY --from=builder /app/app /app
+12
+ 
+13
+CMD ["/app"]
+```
+Result
+```
+Build Tools Removed
+2
+Smaller Image
+3
+Better Security
+```
+Complete Python Dockerfile
+Dockerfile
+1
+FROM python:3.11
+2
+ 
+3
+LABEL author="Reddy"
+4
+ 
+5
+WORKDIR /app
+6
+ 
+7
+COPY requirements.txt .
+8
+ 
+9
+RUN pip install -r requirements.txt
+10
+ 
+11
+COPY . .
+12
+ 
+13
+ENV APP_ENV=production
+14
+ 
+15
+EXPOSE 5000
+16
+ 
+17
+CMD ["python","app.py"]
+```
+Docker Build Process Internally
+```
+Dockerfile
+   ↓
+FROM
+   ↓
+Layer 1
+
+RUN
+   ↓
+Layer 2
+
+COPY
+   ↓
+Layer 3
+
+ENV
+   ↓
+Layer 4
+
+CMD
+   ↓
+Final Image
+
+```
+
+Docker caches layers.
+
+If only source code changes:
+
+```
+FROM Cached
+2
+RUN Cached
+3
+COPY Rebuilt
+```
+
+This makes builds faster.
+
+Most Important Dockerfile Differences (Interview)
+COPY vs ADD
+```
+COPY = Only copies files
+2
+ADD = Copies + Extracts tar + Downloads URLs
+```
+RUN vs CMD
+```
+RUN = Executes during image build
+2
+ 
+3
+CMD = Executes when container starts
+```
+CMD vs ENTRYPOINT
+```
+CMD = Default command, can be replaced
+2
+ 
+3
+ENTRYPOINT = Fixed executable, arguments appended
+```
+ARG vs ENV
+```
+ARG = Build-time variable
+2
+ 
+3
+ENV = Runtime + Build-time variable
+```
+EXPOSE vs -p
+```
+EXPOSE = Documentation
+2
+ 
+3
+-p = Actually publishes port
+```
+## Interview Answer (2-Minute Version)
+
+A Dockerfile is a set of instructions used to build a Docker image. Common instructions include FROM (base image), COPY/ADD (copy files), RUN (execute build commands), WORKDIR (set working directory), ENV and ARG (variables), EXPOSE (document ports), VOLUME (persistent storage), USER (container user), CMD (default startup command), ENTRYPOINT (fixed executable), and HEALTHCHECK (health monitoring). Docker builds images layer by layer, and each instruction creates a new layer, enabling caching and faster builds.
