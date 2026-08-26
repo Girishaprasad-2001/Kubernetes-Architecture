@@ -675,26 +675,29 @@ Deploy:
  kubectl apply -f nginx-pod.yaml
 ```
 #### Complete Workflow
+```
 User
- |
- | kubectl apply
- v
+  |
+  | kubectl apply
+  v
 API Server
- |
- v
+  |
+  v
 etcd
- |
- v
+  |
+  v
 Scheduler
- |
- v
+  |
+  v
 Worker Node
- |
- +--> kubelet
-        |
-        +--> Container Runtime (containerd)
-        |
-        +--> CNI (Calico/Cilium)
-        |
-        v
-      Running Pod
+  |
+  +--> kubelet
+         |
+         +--> Container Runtime (containerd)
+         |
+         +--> CNI (Calico/Cilium)
+         |
+         v
+       Running Pod
+
+```
