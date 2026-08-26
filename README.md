@@ -166,23 +166,44 @@ Network Configuration
 ```
 The kubelet calls the configured CNI plugin whenever a pod is created or deleted.
 
-### Popular Kubernetes CNI Plugins
+markdown
 
-CNI Plugin 
+## Popular Kubernetes CNI Plugins
 
-Key Features 
+| CNI Plugin | Key Features |
+| :--- | :--- |
+| **Calico** | Networking + Network Policies, BGP support |
+| **Cilium** | eBPF-based, high performance, observability |
+| **Flannel** | Simple overlay networking |
+| **Weave Net** | Easy setup, mesh networking |
+| **Antrea** | Open vSwitch based |
+| **AWS VPC CNI** | Native AWS VPC networking for EKS |
+| **Azure CNI** | Native Azure networking for AKS |
 
-****Calico****
-Networking + Network Policies, BGP support
-****Cilium****
-eBPF-based, high performance, observability
-****Flannel****
-Simple overlay networking
-****Weave Net****
-Easy setup, mesh networking
-****Antrea****
-Open vSwitch based
-****AWS VPC CNI****
-Native AWS VPC networking for EKS
-****Azure CNI****
-Native Azure networking for AKS
+##### Example
+
+To check the CNI running in your cluster:
+```
+kubectl get pods -n kube-system
+```
+Look for pods such as:
+```
+calico-node
+cilium
+kube-flannel-ds
+aws-node
+azure-cni
+```
+View CNI configuration
+```
+ls /etc/cni/net.d/
+cat /etc/cni/net.d/*.conf
+```
+#### Why CNI is important
+1. Enables Pod-to-Pod communication
+2. Enables Pod-to-Service communication
+3. Supports Network Policies
+4. Provides IP address management (IPAM)
+5. Integrates Kubernetes with cloud and on-premises networks
+
+In short, CNI is the networking layer that makes Kubernetes pods communicate with each other and the outside world.
