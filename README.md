@@ -490,3 +490,211 @@ Terraform Data Sources are used to fetch information about existing infrastructu
 
 Terraform Import is used to bring existing infrastructure under Terraform management by adding it to the Terraform state.
  Terraform Data Source is used to read information about existing resources without managing or modifying them. Import is for ownership and lifecycle management, while a data source is for reference and consumption of existing infrastructure.
+
+ ## GitHub Actions Workflow
+
+A GitHub Actions workflow is an automated process defined in a YAML file that runs when specific events occur in a GitHub repository.
+
+The workflow files are stored in:
+```
+.github/workflows/
+```
+Workflow Structure
+```
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Command
+        run: echo "Hello GitHub Actions"
+```
+#### Key Components
+1. name
+
+Workflow name displayed in GitHub.
+```
+name: CI Pipeline`
+```
+2. on
+
+Defines the trigger event.
+```
+on:
+  push:
+  pull_request:
+```
+Common triggers:
+```
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+```
+3. jobs
+
+A workflow contains one or more jobs.
+```
+jobs:
+  build:
+```
+4. runs-on
+
+Specifies the runner.
+```  runs-on: ubuntu-latest ```
+Options:
+```
+runs-on: ubuntu-latest
+runs-on: windows-latest
+runs-on: macos-latest
+runs-on: self-hosted
+```
+5. steps
+
+Tasks executed within a job.
+```
+steps:
+  - name: Checkout
+    uses: actions/checkout@v4
+
+  - name: Run Tests
+    run: npm test
+```
+CI/CD Example
+Build and Test Java Application
+```
+name: Java CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build
+        run: mvn clean install
+
+      - name: Test
+        run: mvn test
+```
+Docker Build Example
+```
+name: Docker Build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Image
+        run: docker build -t myapp:latest .
+```
+Kubernetes Deployment Example
+```
+name: Deploy to K8s
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure kubectl
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+
+      - name: Deploy
+        run: kubectl apply -f deployment.yaml
+```
+Frequently Used Actions
+```
+actions/checkout
+actions/setup-java
+actions/setup-node
+docker/login-action
+docker/build-push-action
+azure/login
+aws-actions/configure-aws-credentials
+```
+### Interview Answer
+
+GitHub Actions is GitHub's CI/CD platform used to automate software workflows. A workflow is defined in a YAML file under .github/workflows/ and consists of triggers (on), jobs, runners (runs-on), and steps. It can be used to build, test, scan, package, and deploy applications automatically whenever code is pushed, a pull request is created, or a manual trigger occurs.
+
+## Kubernetes Full Pod Creation Workflow (End-to-End Example)
+
+Let's take a simple example:
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+spec:
+  containers:
+  - name: nginx
+    image: nginx:latest
+```
+Deploy:
+```
+ kubectl apply -f nginx-pod.yaml
+```
+#### Complete Workflow
+User
+ |
+ | kubectl apply
+ v
+API Server
+ |
+ v
+etcd
+ |
+ v
+Scheduler
+ |
+ v
+Worker Node
+ |
+ +--> kubelet
+        |
+        +--> Container Runtime (containerd)
+        |
+        +--> CNI (Calico/Cilium)
+        |
+        v
+      Running Pod
