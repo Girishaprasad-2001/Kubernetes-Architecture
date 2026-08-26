@@ -3752,3 +3752,209 @@ Pods
 ### Interview Answer
 
 A Deployment YAML defines how applications run in Kubernetes, including replicas, container images, labels, selectors, resource requests, and limits. A Service YAML exposes those Pods using selectors and provides stable networking. The Service forwards traffic from the service port to the target port of matching Pods, while the Deployment ensures the desired number of Pods are always running.
+
+## PV, PVC, and Volume Claim in Kubernetes
+
+Kubernetes uses Persistent Volumes (PV) and Persistent Volume Claims (PVC) to provide persistent storage for Pods.
+
+Why Do We Need PV and PVC?
+
+Without persistent storage:
+```
+Pod → Data Stored
+Pod Deleted → Data Lost
+```
+With PV and PVC:
+```
+Pod → PVC → PV → Storage
+```
+Data remains even if the Pod is recreated.
+### Components
+1. Persistent Volume (PV)
+
+A PV is a storage resource in the cluster.
+
+Example:
+```
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-pv
+
+spec:
+  capacity:
+    storage: 5Gi
+
+  accessModes:
+    - ReadWriteOnce
+
+  hostPath:
+    path: /data
+```
+Create 
+```
+kubectl apply -f pv.yaml
+```
+2. Persistent Volume Claim (PVC)
+
+A PVC is a request for storage by a Pod.
+
+Example:
+```
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 2Gi
+```
+create 
+```
+kubectl apply -f pvc.yaml
+```
+Kubernetes automatically binds:
+```
+PVC (2Gi)
+    ↓
+PV (5Gi)
+```
+3. Use PVC in a Pod
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+
+    volumeMounts:
+    - name: storage
+      mountPath: /usr/share/nginx/html
+
+  volumes:
+  - name: storage
+    persistentVolumeClaim:
+      claimName: my-pvc
+```
+Apply 
+```
+kubectl apply -f pod.yaml
+```
+Complete Workflow
+Step 1
+
+Admin creates PV:
+```
+PV = 10Gi
+```
+Step 2
+
+Developer creates PVC:
+```
+PVC requests = 5Gi
+```
+Step 3
+
+Kubernetes binds PVC to PV:
+```
+PVC → PV
+```
+Step 4
+
+Pod mounts PVC:
+```
+Pod
+ ↓
+PVC
+ ↓
+PV
+ ↓
+Storage
+```
+Check Status
+
+View PV:
+```
+kubectl get pv
+```
+Output
+```
+NAME     CAPACITY ACCESS MODES STATUS
+my-pv    5Gi      RWO          Bound
+```
+View PVC:
+```
+kubectl get pvc
+```
+output
+```
+NAME      STATUS  VOLUME
+my-pvc    Bound   my-pv
+```
+Describe PVC:
+```
+kubectl describe pvc my-pvc
+```
+### Access Modes
+ReadWriteOnce (RWO)
+
+One node can mount the volume in read-write mode.
+```
+accessModes:
+- ReadWriteOnce
+```
+ReadOnlyMany (ROX)
+
+Multiple nodes can read.
+```
+accessModes:
+- ReadOnlyMany
+```
+ReadWriteMany (RWX)
+
+Multiple nodes can read and write.
+```
+accessModes:
+- ReadWriteMany
+```
+Static vs Dynamic Provisioning
+Static Provisioning
+
+Admin creates PV manually.
+```
+PV Created
+    ↓
+PVC Requests
+    ↓
+PV Bound
+
+```
+Dynamic Provisioning
+
+Uses a StorageClass.
+```
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: fast-storage
+provisioner: kubernetes.io/aws-ebs
+```
+PVC 
+```
+spec:
+  storageClassName: fast-storage
+
+```
+Kubernetes automatically creates the PV.
+## Interview Answer
+
+A Persistent Volume (PV) is a storage resource available in a Kubernetes cluster, while a Persistent Volume Claim (PVC) is a request for storage made by a Pod. Kubernetes binds a PVC to a suitable PV based on size and access mode. The Pod uses the PVC to access storage without knowing the underlying storage details. This separation allows storage to persist even when Pods are deleted or recreated.
