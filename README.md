@@ -2876,3 +2876,349 @@ kubectl uncordon <node-name>
 ### Interview Answer
 
 On a worker node, I typically check node health using kubectl get nodes and kubectl describe node. I verify kubelet and containerd services using systemctl, inspect containers with crictl, monitor resource utilization with kubectl top node, and use kubectl cordon, drain, and uncordon during maintenance activities. These commands help troubleshoot node, pod, networking, and runtime issues effectively.
+
+## How to Troubleshoot kubelet Issues
+
+kubelet is the primary agent running on every Kubernetes worker node. It communicates with the API Server and ensures pods are running as expected.
+
+1. Check Node Status
+
+First identify whether the node is healthy.
+
+```
+kubectl get nodes
+```
+
+Example:
+
+```
+worker-1 NotReady
+```
+
+Get detailed information:
+
+```
+kubectl describe node worker-1
+```
+
+Check for:
+
+MemoryPressure
+DiskPressure
+PIDPressure
+NetworkUnavailable
+Ready=False
+2. Verify kubelet Service Status
+
+Check if kubelet is running:
+
+```
+systemctl status kubelet
+```
+
+Healthy output:
+
+```
+Active: active (running)
+```
+
+If stopped:
+
+```
+systemctl start kubelet
+```
+
+Restart kubelet:
+
+```
+systemctl restart kubelet
+```
+
+Enable on boot:
+```
+systemctl enable kubelet
+```
+3. Check kubelet Logs
+
+Most kubelet issues can be found in logs.
+
+```
+journalctl -u kubelet -f
+```
+
+View recent logs:
+
+```
+journalctl -u kubelet -n 100
+```
+
+Common errors:
+
+API Server Connection Failure
+```
+Unable to connect to the server
+```
+
+Possible causes:
+
+API Server down
+Firewall issue
+Certificate problem
+Certificate Issues
+```
+certificate has expired
+```
+
+Check certificates:
+
+```
+openssl x509 -in /var/lib/kubelet/pki/kubelet-client-current.pem -text -noout
+```
+Resource Pressure
+```
+NodeHasMemoryPressure
+```
+
+Check memory:
+
+```
+free -h
+```
+
+Check CPU:
+
+```
+top
+```
+
+Check disk:
+
+```
+df -h
+```
+4. Verify kubelet Configuration
+
+View kubelet configuration:
+
+```
+cat /var/lib/kubelet/config.yaml
+```
+
+Check kubeconfig:
+
+```
+cat /etc/kubernetes/kubelet.conf
+```
+
+Validate kubelet startup arguments:
+
+```
+ps -ef | grep kubelet
+```
+5. Verify Communication with API Server
+
+Check API Server accessibility:
+
+```
+curl -k https://<api-server-ip>:6443/version
+```
+
+Or:
+
+```
+kubectl cluster-info
+```
+
+Common issue:
+
+```
+connection refused
+```
+
+Possible causes:
+
+API Server down
+Security group/firewall block
+DNS issue
+6. Check Container Runtime
+
+kubelet depends on container runtime.
+
+For containerd:
+
+```
+systemctl status containerd
+```
+
+Restart if needed:
+
+```
+systemctl restart containerd
+```
+
+Verify runtime:
+
+```
+crictl info
+```
+
+Common error:
+
+```
+failed to connect runtime
+```
+7. Check Pod Status
+
+If kubelet is unhealthy, pods may fail.
+
+```
+kubectl get pods -A -o wide
+```
+
+Describe problematic pod:
+
+```
+kubectl describe pod <pod-name>
+```
+
+Look at Events section.
+
+8. Check CNI Network Issues
+
+Pods stuck in ContainerCreating often indicate CNI problems.
+
+Check network plugins:
+
+```
+kubectl get pods -n kube-system
+```
+
+Examples:
+
+```
+calico-node
+2
+cilium
+3
+flannel
+Show more lines
+
+Check logs:
+
+Shell
+1
+kubectl logs -n kube-system <cni-pod>
+```
+9. Validate Node Registration
+
+Check whether kubelet registered the node.
+
+```
+kubectl get nodes
+```
+
+If missing:
+
+Check logs:
+
+```
+journalctl -u kubelet | grep register
+```
+
+Common errors:
+
+```
+Failed to register node
+```
+
+Causes:
+
+Invalid kubeconfig
+Certificate issue
+API server issue
+10. Common kubelet Problems and Fixes
+Node NotReady
+
+Check:
+
+```
+kubectl describe node <node>
+2
+journalctl -u kubelet -f
+```
+
+Possible causes:
+
+kubelet stopped
+container runtime down
+network issue
+Pods Stuck in Pending
+
+Check:
+
+```
+kubectl describe pod <pod>
+```
+
+Possible causes:
+
+Insufficient resources
+Taints
+Scheduler issue
+Pods Stuck in ContainerCreating
+
+Check:
+
+```
+kubectl describe pod <pod>
+```
+
+Possible causes:
+
+CNI failure
+Volume mount issue
+Image pull problem
+CrashLoopBackOff
+
+Check logs:
+
+```
+1
+kubectl logs <pod>
+2
+kubectl logs <pod> --previous
+```
+
+Possible causes:
+
+Application crash
+Configuration issue
+Quick Troubleshooting Commands
+```
+kubectl get nodes
+2
+kubectl describe node <node>
+3
+systemctl status kubelet
+4
+systemctl restart kubelet
+5
+journalctl -u kubelet -f
+6
+systemctl status containerd
+7
+crictl info
+8
+df -h
+9
+free -h
+10
+kubectl get pods -A -o wide
+11
+kubectl describe pod <pod>
+12
+ 
+```
+### Interview Answer
+
+When troubleshooting kubelet issues, I first check the node status using kubectl get nodes and kubectl describe node. Then I verify the kubelet service with systemctl status kubelet and review logs using journalctl -u kubelet -f. I also validate connectivity to the API Server, check the container runtime (containerd), inspect CNI networking, and review pod events. Most kubelet problems are related to API Server connectivity, expired certificates, resource pressure, container runtime failures, or networking issues.
