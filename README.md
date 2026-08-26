@@ -289,8 +289,8 @@ Docker executes:
 echo Kubernetes
 ```
 Difference
-     |   CMD	   |     ENTRYPOINT |
+|   CMD	   |     ENTRYPOINT |
 | :--- | :--- |
-| Provides default command/arguments	   | Defines the main executable |
+| Provides default command/arguments| Defines the main executable |
 | Easily overridden at runtime	    |     Not overridden unless --entrypoint is used |
 | Can be omitted	                  |     Usually used when container has a fixed purpose |
