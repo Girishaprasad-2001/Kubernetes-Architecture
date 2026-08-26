@@ -323,3 +323,88 @@ This starts Bash instead of the image's configured ENTRYPOINT.
 
 ENTRYPOINT specifies the main process that always runs when a container starts, while CMD provides default arguments or a default command. When both are used together, ENTRYPOINT defines the executable and CMD supplies its default parameters, which can be overridden during docker run.
 
+## Terraform Import
+
+terraform import is used to bring existing infrastructure resources under Terraform management without recreating them.
+Syntax
+```
+terraform import [options] ADDRESS ID
+```
+ADDRESS: Terraform resource address in your configuration.
+ID: Existing resource identifier from the provider.
+#### Example: Import an AWS EC2 Instance
+Create the resource block in Terraform:
+```
+resource "aws_instance" "web" {
+  # configuration will be updated later
+}
+```
+Import the existing EC2 instance:
+```
+terraform import aws_instance.web i-0123456789abcdef0
+```
+Verify:
+```
+terraform state list
+terraform state show aws_instance.web
+```
+Example: Import an Azure Resource Group
+```
+resource "azurerm_resource_group" "rg" {
+}
+```
+```
+terraform import azurerm_resource_group.rg \
+/subscriptions/<subscription-id>/resourceGroups/my-rg
+```
+Example: Import a Kubernetes Namespace
+```
+resource "kubernetes_namespace" "dev" {
+  metadata {
+    name = "dev"
+  }
+}
+```
+```
+terraform import kubernetes_namespace.dev dev
+```
+
+#### Important Notes
+Import only adds the resource to the Terraform state.
+Terraform does not automatically generate complete .tf configuration for imported resources.
+After import, update your Terraform code to match the actual resource configuration.
+Run:
+```
+terraform plan
+```
+to identify differences between your configuration and the imported resource.
+
+Useful Commands
+```
+# List imported resources
+terraform state list
+
+# Show resource details from state
+terraform state show <resource>
+
+# Remove from state only
+terraform state rm <resource>
+
+# Move resource in state
+terraform state mv <source> <destination>
+```
+##### Terraform 1.5+ Import Block
+
+Instead of the CLI command, you can define imports in code:
+```
+import {
+  to = aws_instance.web
+  id = "i-0123456789abcdef0"
+}
+```
+Then run:
+```
+terraform plan
+terraform apply
+
+This approach is preferred for Infrastructure as Code because the import operation can be tracked and reviewed alongside your Terraform configuration.
