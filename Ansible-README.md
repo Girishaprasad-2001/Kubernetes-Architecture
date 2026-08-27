@@ -694,527 +694,56 @@ ansible-playbook playbook.
 These are the commands and concepts most commonly used by DevOps Engineers, SREs, Linux Administrators, and CI/CD engineers in production environments.
 
 ### Ansible Top 20 Interview Questions and Answers
-1. What is Ansible?
-Answer:
+# Ansible Top 20 Interview Questions and Answers
 
+## 1. What is Ansible?
+
+### Answer
 Ansible is an open-source IT automation and configuration management tool used for:
 
-Configuration Management
-Application Deployment
-Infrastructure Provisioning
-Orchestration
-Key Features:
+- Configuration Management
+- Application Deployment
+- Infrastructure Provisioning
+- Orchestration
 
-Agentless
-Uses SSH/WinRM
-YAML-based Playbooks
-Easy to learn and maintain
-Interview Answer:
+### Key Features
 
+- Agentless
+- Uses SSH/WinRM
+- YAML-based Playbooks
+- Easy to learn and maintain
+
+### Interview Answer
 Ansible is an agentless automation tool that uses SSH to manage servers and automate configuration management, application deployment, and infrastructure provisioning.
 
-2. Difference between Playbook and Ad Hoc Command?
-Ad Hoc Command
+---
+
+## 2. Difference between Playbook and Ad Hoc Command?
+
+### Ad Hoc Command
+
 Used for one-time tasks.
 
-
-
-
-Shell
+```bash
 ansible all -m ping
-Playbook
+```
+
+### Playbook
+
 Used for complex, repeatable automation tasks.
 
+```bash
+ansible-playbook webserver.yml
+```
 
+### Difference
 
+| Ad Hoc | Playbook |
+|----------|----------|
+| One-time task | Reusable automation |
+| Command line | YAML file |
+| Quick execution | Complex workflows |
 
-Shell
-ansible-playbook webserver
-Difference
-Ad Hoc	Playbook
-One-time task	Reusable automation
-Command line	YAML file
-Quick execution	Complex workflows
-Interview Answer:
+### Interview Answer
 
-Ad Hoc commands are used for quick one-time operations, while Playbooks are YAML-based files used for reusable and complex automation workflows.
-
-3. What is Inventory?
-Answer:
-
-Inventory is a file that contains the list of managed hosts.
-
-Example:
-
-
-
-
-INI
-[web]
-server1
-server2
- 
-[db]
-db1
-Interview Answer:
-
-Inventory is a collection of managed nodes organized into groups that Ansible uses to determine where tasks should be executed.
-
-4. What are Facts?
-Answer:
-
-Facts are system information automatically gathered by Ansible.
-
-Example:
-
-
-
-
-YAML
-{{ ansible_hostname }}
-{{ ansible_ip_addresses }}
-{{ ansible_os_family }}
-View facts:
-
-
-
-
-Shell
-ansible all -m setup
-Interview Answer:
-
-Facts are automatically collected details about managed hosts such as hostname, IP address, operating system, memory, and disk information.
-
-5. Difference between Command and Shell Module?
-Command Module
-
-
-
-YAML
-- command: ls -l
-Does not support:
-
-
-
-
-Shell
-|
->
-<
-&&
-Shell Module
-
-
-
-YAML
-- shell: "cat file.txt | grep test"
-Supports shell operations.
-
-Difference
-Command	Shell
-Safer	More flexible
-No shell processing	Executes through shell
-Faster	Slightly slower
-Interview Answer:
-
-The command module executes commands directly without shell interpretation, while the shell module executes commands through the shell and supports pipes, redirects, and environment variables.
-
-6. What is Ansible Vault?
-Answer:
-
-Ansible Vault encrypts sensitive data.
-
-Example:
-
-
-
-
-Shell
-ansible-vault create secrets.yml
-``
-Encrypt:
-
-
-
-
-Shell
-ansible-vault encrypt secrets.yml
-Decrypt:
-
-
-
-
-Shell
-ansible-vault decrypt secrets.yml
-Interview Answer:
-
-Ansible Vault is used to securely store sensitive information such as passwords, API keys, and certificates by encrypting files and variables.
-
-7. What are Roles?
-Answer:
-
-Roles organize playbooks into reusable components.
-
-Structure:
-
-
-
-
-Plain Text
-roles/
- ├── webserver
-      ├── tasks
-      ├── handlers
-      ├── templates
-      ├── vars
-      └── defaults
-Use:
-
-
-
-
-YAML
-roles:
-  - webserver
-Interview Answer:
-
-Roles provide a standardized way to organize and reuse Ansible code using predefined directories for tasks, templates, handlers, and variables.
-
-8. What are Handlers?
-Answer:
-
-Handlers execute only when notified.
-
-Example:
-
-
-
-
-YAML
-tasks:
-  - name: Update Config
-    template:
-      src: app.conf.j2
-      dest: /etc/app.conf
-    notify: restart service
- 
-handlers:
-  - name: restart service
-    service:
-      name: nginx
-      state: restarted
-Interview Answer:
-
-Handlers are special tasks that run only when triggered by other tasks, commonly used for service restarts after configuration changes.
-
-9. What are Tags?
-Answer:
-
-Tags allow selective task execution.
-
-Example:
-
-
-
-
-YAML
-tasks:
-  - name: Install Apache
-    yum:
-      name: httpd
-    tags:
-      - install
-``
-Run:
-
-
-
-
-Shell
-ansible-playbook site.yml --tags install
-Interview Answer:
-
-Tags help execute specific tasks or groups of tasks instead of running the entire playbook.
-
-10. What is Idempotency?
-Answer:
-
-Idempotency means running the same playbook multiple times produces the same result.
-
-Example:
-
-
-
-
-YAML
-- name: Install Nginx
-  yum:
-    name: nginx
-    state: present
-Ansible installs only if not already present.
-
-Interview Answer:
-
-Idempotency ensures that repeated execution of a playbook does not create duplicate changes and always maintains the desired state.
-
-11. How does Ansible connect to servers?
-Answer:
-
-Linux:
-
-
-
-
-Plain Text
-SSH
-Windows:
-
-
-
-
-Plain Text
-WinRM
-Ansible is agentless and requires no software installation on target servers.
-
-Interview Answer:
-
-Ansible connects to Linux systems using SSH and Windows systems using WinRM without requiring agents on managed nodes.
-
-12. What is Dynamic Inventory?
-Answer:
-
-Dynamic inventory generates host lists automatically from cloud providers.
-
-Example:
-
-
-
-
-Shell
-aws_ec2.yaml
-Sources:
-
-AWS
-Azure
-GCP
-VMware
-Interview Answer:
-
-Dynamic inventory retrieves host information dynamically from cloud environments instead of maintaining static inventory files.
-
-13. Difference between Variables and Facts?
-Variables
-Defined by users.
-
-
-
-
-YAML
-app_port: 8080
-Facts
-Automatically discovered.
-
-
-
-
-YAML
-ansible_hostname
-Interview Answer:
-
-Variables are user-defined values used in playbooks, while facts are automatically collected system information from managed hosts.
-
-14. How do you secure passwords?
-Answer:
-
-Methods:
-
-Ansible Vault
-HashiCorp Vault
-Azure Key Vault
-AWS Secrets Manager
-Example:
-
-
-
-
-Shell
-ansible-vault encrypt secrets.yml
-Interview Answer:
-
-Passwords should never be hardcoded. I secure them using Ansible Vault or enterprise secret-management solutions like HashiCorp Vault or cloud-native secret stores.
-
-15. What is become?
-Answer:
-
-Used for privilege escalation.
-
-Example:
-
-
-
-
-YAML
-tasks:
-  - name: Install Package
-    yum:
-      name: httpd
-      state: present
-    become: yes
-Equivalent:
-
-
-
-
-Shell
-sudo
-Interview Answer:
-
-The become directive allows Ansible to execute tasks with elevated privileges, typically using sudo on Linux systems.
-
-16. What is Jinja2 Template?
-Answer:
-
-Jinja2 templates create dynamic configuration files.
-
-Template:
-
-
-
-
-Jinja
-server_name={{ hostname }}
-Playbook:
-
-
-
-
-YAML
-template:
-  src: nginx.conf.j2
-  dest: /etc/nginx/nginx.conf
-`
-Interview Answer:
-
-Jinja2 templates enable dynamic file generation by replacing variables and expressions during playbook execution.
-
-17. What is Ansible Galaxy?
-Answer:
-
-A repository for sharing roles and collections.
-
-Install role:
-
-
-
-
-Shell
-ansible-galaxy role install geerlingguy.nginx
-Interview Answer:
-
-Ansible Galaxy is a community repository used to discover, download, and share reusable roles and collections.
-
-18. How do you run a playbook on specific hosts?
-Using Limit
-
-
-
-Shell
-ansible-playbook site.yml --limit web
-Specific server:
-
-
-
-
-Shell
-ansible-playbook site.yml --limit server1
-``
-Interview Answer:
-
-I use the --limit option to target specific hosts or inventory groups when executing playbooks.
-
-19. How do you troubleshoot playbook failures?
-Increase Verbosity
-
-
-
-Shell
-ansible-playbook site.yml -v
-More details:
-
-
-
-
-Shell
-ansible-playbook site.yml -vvv
-Maximum debug:
-
-
-
-
-Shell
-ansible-playbook site.yml -vvvv
-Check:
-
-
-
-
-Shell
-ansible all -m ping
-Syntax validation:
-
-
-
-
-Shell
-ansible-playbook site.yml --syntax-check
-Dry run:
-
-
-
-
-Shell
-ansible-playbook site.yml --check
-Interview Answer:
-
-I troubleshoot failures using verbose logging (-vvv), syntax checks, connectivity validation, task debugging, and check mode before making changes.
-
-20. How do you deploy applications using Ansible?
-Typical Flow
-
-
-
-Plain Text
-Copy Artifact
-      ↓
-Install Dependencies
-      ↓
-Configure Application
-      ↓
-Start Service
-      ↓
-Health Check
-Example:
-
-
-
-
-YAML
-- hosts: app
- 
-  tasks:
- 
-    - name: Copy WAR File
-      copy:
-        src: app.war
-        dest: /opt/tomcat/webapps/
- 
-    - name: Restart Tomcat
-      service:
-        name: tomcat
-        state: restarted
-Interview Answer:
-
-I use Ansible playbooks to automate application deployment by copying artifacts, configuring servers, managing services, deploying application packages, and performing validation checks after deployment.
-
-2-Minute Interview Summary
-"Ansible is an agentless automation tool that uses SSH or WinRM to manage infrastructure. Core concepts include inventories, playbooks, variables, facts, roles, handlers, tags, and templates. It supports idempotent automation, secure secret management through Ansible Vault, dynamic inventories for cloud environments, and application deployments through reusable playbooks and roles."
+Ad Hoc commands are used for quick one-time operations, while Playbooks are YAML-based 
