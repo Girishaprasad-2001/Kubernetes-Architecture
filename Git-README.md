@@ -1008,3 +1008,8 @@ PROD Approval
 ### What is Git Branch Protection?
 
 Branch Protection Rules in GitHub protect critical branches such as main and release. They enforce controls like mandatory pull requests, code reviews, successful CI/CD checks, prevention of force pushes and branch deletion, and restricted access. In enterprise projects, we typically require at least two approvals, successful SonarQube and security scans, and passing build validations before allowing a merge into the main branch.
+
+
+### How do you restrict who can push to a branch in GitHub?
+
+I use Branch Protection Rules. In the repository settings, I create a protection rule for branches such as main or release/*, enable "Restrict who can push to matching branches," and assign only authorized users or teams like DevOps or Release Managers. I also require pull requests, approvals, and successful CI/CD checks to ensure code quality and governance before changes reach protected branches.
