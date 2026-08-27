@@ -1640,10 +1640,10 @@ source = "terraform-aws-modules/vpc/aws"
 
 The Terraform Root Module is the set of Terraform configuration files in the current working directory where Terraform commands are executed. It is automatically loaded by Terraform and can call one or more child modules. Child modules are reusable components that help organize and standardize infrastructure code. If a variable inside a module has a default value, Terraform uses that value when no explicit value is provided.
 
-### After Import
+
 
 ## 4. Terraform Import: 
 Terraform Import allows you to bring existing cloud resources (that weren’t created with Terraform) under Terraform’s management — without recreating them.
-
-Terraform updates the state file to include the imported resource.
-You’ll need to write the corresponding resource block in your .tf file so Terraform knows how to manage it.
+### After Import
+1. Terraform updates the state file to include the imported resource.
+2. You’ll need to write the corresponding resource block in your .tf file so Terraform knows how to manage it.
