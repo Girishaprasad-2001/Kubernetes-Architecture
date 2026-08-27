@@ -2311,4 +2311,39 @@ State Updated
 terraform destroy (when required)
 ```
 
+### Calling an External Module from Root Module in Terraform
 
+An external module is a module stored outside your current Terraform project, such as:
+
+Terraform Registry
+GitHub Repository
+Git Repository
+S3/Object Storage (less common)
+#### Real-Time Enterprise Example
+```
+Root Module
+      │
+      ├── VPC Module
+      │      (Terraform Registry)
+      │
+      ├── EKS Module
+      │      (GitHub Enterprise)
+      │
+      ├── IAM Module
+      │      (Private Git Repo)
+      │
+      └── Monitoring Module
+             (Terraform Registry)
+```
+Root module:
+```
+module "vpc" {
+  source = "terraform-aws-modules/vpc/aws"
+}
+
+module "eks" {
+  source = "git::https://github.com/company/terraform-modules.git//eks?ref=v2.0"
+}
+```
+### Q. 
+An external module is a reusable Terraform module stored outside the current project, typically in the Terraform Registry, GitHub, or a private Git repository. It is called from the root module using the module block and a source attribute. During terraform init, Terraform downloads the module and makes its resources available. Outputs from the module can be referenced using module.<module_name>.<output_name>. For production environments, modules should be versioned using tags or specific releases.
