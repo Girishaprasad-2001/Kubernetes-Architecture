@@ -2425,3 +2425,53 @@ terraform apply
           ▼
 Resource Managed by Terraform
 ```
+### Terraform Block Hierarchy
+```
+Terraform Block
+        │
+        ├── Provider Block
+        │
+        ├── Variable Block
+        │
+        ├── Local Block
+        │
+        ├── Resource Block
+        │
+        ├── Data Block
+        │
+        ├── Module Block
+        │
+        ├── Output Block
+        │
+        ├── Import Block
+        │
+        ├── Check Block
+        │
+        └── Moved Block
+```
+### Common Interview Questions
+What is Azure App Service?
+
+Azure App Service is a fully managed PaaS platform used to host web applications, REST APIs, and containerized applications without managing infrastructure.
+
+What is an App Service Plan?
+
+An App Service Plan defines the compute resources, pricing tier, region, and scaling settings used by one or more App Services.
+
+What are Deployment Slots?
+
+Deployment slots are separate environments (such as staging and production) that enable zero-downtime deployments through slot swapping.
+
+How do you scale Azure App Service?
+Scale Up: Increase CPU/RAM.
+Scale Out: Add more instances.
+Can Azure App Service run Docker containers?
+
+Yes. Azure App Service supports custom Docker images from Docker Hub and Azure Container Registry (ACR).
+
+Difference Between App Service and AKS?
+App Service: Best for web apps and APIs with minimal infrastructure management.
+AKS: Best for container orchestration, microservices, and advanced Kubernetes workloads.
+Interview Answer (2 Minutes)
+
+Azure App Service is a fully managed PaaS service that enables hosting of web applications, APIs, and containerized workloads. It supports multiple programming languages, automatic scaling, deployment slots, custom domains, SSL, and integrations with GitHub Actions and Azure DevOps. The underlying infrastructure, patching, and load balancing are managed by Azure, allowing teams to focus on application development and deployment.
