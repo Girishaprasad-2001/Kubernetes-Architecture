@@ -1013,3 +1013,13 @@ Branch Protection Rules in GitHub protect critical branches such as main and rel
 ### How do you restrict who can push to a branch in GitHub?
 
 I use Branch Protection Rules. In the repository settings, I create a protection rule for branches such as main or release/*, enable "Restrict who can push to matching branches," and assign only authorized users or teams like DevOps or Release Managers. I also require pull requests, approvals, and successful CI/CD checks to ensure code quality and governance before changes reach protected branches.
+
+### How do you restrict branch creation in GitHub?
+
+GitHub's modern approach is to use Rulesets. Under Repository or Organization Settings, I create a branch ruleset and enable Restrict Creations. Then I specify which users or teams, such as Release Managers or DevOps, are allowed to create branches matching patterns like release/* or hotfix/*. This prevents unauthorized users from creating sensitive branches while maintaining governance and release control.
+### How to Restrict Branch Deletion in GitHub?
+"To restrict branch deletion in GitHub, I configure Branch Protection Rules under Repository Settings. For critical branches such as main, develop, and release branches, I enable protection and disable deletions. I also require pull requests, approvals, and successful build checks before changes can be merged. In enterprise environments, I prefer Organization Rulesets to enforce consistent branch protection policies across multiple repositories."
+
+### How do you resolve a Git merge conflict?
+
+First, I identify the conflicted files using git status. Then I open the files and review the conflict markers (<<<<<<, =======, >>>>>>>). I decide which changes to keep or combine, remove the markers, and save the file. After that, I stage the resolved files using git add, complete the merge with git commit, and push the changes. For rebase conflicts, I use git rebase --continue after resolving the conflicts.
