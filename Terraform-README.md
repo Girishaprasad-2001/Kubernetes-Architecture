@@ -1610,3 +1610,32 @@ After importing, your .tf files must match the actual resource configuration.
 ## 2. Data Source
 
 Purpose: Read information about existing resources without managing them.
+
+### Types of Terraform Modules
+1. Root Module
+```
+Current working directory
+```
+2. Local Module
+Terraform
+```
+1
+source = "./modules/ec2"
+2
+```
+
+4. Git Module
+Terraform
+```
+1
+source = "git::https://github.com/company/modules.git//ec2"
+```
+6. Registry Module
+Terraform
+```
+1
+source = "terraform-aws-modules/vpc/aws"
+```
+### Interview Answer
+
+The Terraform Root Module is the set of Terraform configuration files in the current working directory where Terraform commands are executed. It is automatically loaded by Terraform and can call one or more child modules. Child modules are reusable components that help organize and standardize infrastructure code. If a variable inside a module has a default value, Terraform uses that value when no explicit value is provided.
