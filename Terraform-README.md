@@ -2378,6 +2378,18 @@ Step 3: Review Generated File
 Check:
 ```
 cat generated_resource.tf
+
+resource "aws_instance" "web" {
+  ami                    = "ami-0abc123456"
+  instance_type          = "t3.micro"
+  availability_zone      = "ap-south-1a"
+  associate_public_ip_address = true
+
+  tags = {
+    Name = "web-server"
+  }
+}
+
 ```
 Review and clean up unnecessary attributes. copy and past into main.tf file and delete generated_resource.tf
 run below command
