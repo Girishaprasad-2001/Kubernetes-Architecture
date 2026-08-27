@@ -333,14 +333,13 @@ Then click Run Workflow in GitHub.
 
 #### 9. Difference between GitHub Actions and Jenkins?
 ### GitHub Actions vs Jenkins
-```
 | Feature | GitHub Actions | Jenkins |
 | :--- | :--- | :--- |
 | **Integration** | Built into GitHub | Separate server |
 | **Maintenance** | Minimal maintenance | Server administration required |
 | **Configuration** | YAML-based | Pipeline scripts (Groovy) |
 | **Ecosystem** | GitHub-native | Tool agnostic |
-```
+
 
 ### 10. Explain a Terraform CI/CD Pipeline in GitHub Actions.
 
