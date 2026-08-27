@@ -694,56 +694,770 @@ ansible-playbook playbook.
 These are the commands and concepts most commonly used by DevOps Engineers, SREs, Linux Administrators, and CI/CD engineers in production environments.
 
 ### Ansible Top 20 Interview Questions and Answers
-# Ansible Top 20 Interview Questions and Answers
+Ansible Interview Questions & Answers
+### 1. What is Ansible?
 
-## 1. What is Ansible?
-
-### Answer
 Ansible is an open-source IT automation and configuration management tool used for:
 
-- Configuration Management
-- Application Deployment
-- Infrastructure Provisioning
-- Orchestration
+Configuration Management
+Application Deployment
+Infrastructure Provisioning
+Orchestration
 
-### Key Features
+Key Features:
 
-- Agentless
-- Uses SSH/WinRM
-- YAML-based Playbooks
-- Easy to learn and maintain
+Agentless architecture
+Uses SSH for connectivity
+Written in Python
+Uses YAML-based Playbooks
 
-### Interview Answer
-Ansible is an agentless automation tool that uses SSH to manage servers and automate configuration management, application deployment, and infrastructure provisioning.
+Example:
 
----
-
-## 2. Difference between Playbook and Ad Hoc Command?
-
-### Ad Hoc Command
+```
+ansible all -m ping
+```
+2. Difference between Playbook and Ad Hoc Command?
+Ad Hoc Command
 
 Used for one-time tasks.
 
-```bash
+Example:
+
+```
+ansible webservers -m ping
+```
+```
+ansible webservers -m yum -a "name=httpd state=present"
+```
+Playbook
+
+Used for complex and repeatable automation.
+
+Example:
+```
+YAML
+1
+---
+2
+- hosts: webservers
+3
+tasks:
+4
+- name: Install Apache
+5
+yum:
+6
+name: httpd
+7
+state: present
+```
+Difference
+Ad Hoc	PlaybookOne-time execution	Reusable automation
+Command line	YAML file
+Simple tasks	Complex workflows
+No version control	Can be stored in Git
+### 3. What is Inventory?
+
+Inventory is the list of managed hosts and groups.
+
+Example:
+
+```
+1
+[webservers]
+2
+192.168.1.10
+3
+192.168.1.11
+4
+ 
+5
+[dbservers]
+6
+192.168.1.20
+```
+
+Check inventory:
+
+```
+ansible-inventory --list
+```
+4. What are Facts?
+
+Facts are automatically gathered information about managed hosts.
+
+Examples:
+
+```
+1
+ansible_facts
+```
+
+Contains:
+
+```
+Hostname
+2
+IP Address
+3
+OS Version
+4
+Memory
+5
+CPU
+6
+Disk Information
+```
+
+View facts:
+
+```
+1
+ansible all -m setup
+```
+
+Example usage:
+
+```
+1
+- debug:
+2
+msg: "{{ ansible_hostname }}"
+```
+5. Difference between Command and Shell Module?
+Command Module
+
+Does not execute through shell.
+
+```
+1
+- command: ls -l
+```
+
+Safer and preferred.
+
+Shell Module
+
+Executes through shell.
+
+```
+1
+- shell: "ls -l | grep test"
+```
+
+Supports:
+
+Pipes
+Redirects
+Environment variables
+Example
+
+Command won't work:
+
+```
+1
+- command: cat file.txt | grep error
+2
+ 
+```
+
+Shell works:
+
+```
+- shell: cat file.txt | grep error
+```
+6. What is Ansible Vault?
+
+Ansible Vault encrypts sensitive information.
+
+Examples:
+
+Passwords
+API Keys
+Tokens
+Certificates
+
+Create encrypted file:
+
+```
+1
+ansible-vault create secrets.yml
+2
+``
+```
+
+Edit:
+
+```
+1
+ansible-vault edit secrets.yml
+```
+
+Encrypt existing file:
+
+```
+ansible-vault encrypt secrets.yml
+```
+
+Run playbook:
+
+```
+1
+ansible-playbook site.yml --ask-vault-pass
+```
+7. What are Roles?
+
+Roles organize playbooks into reusable structures.
+
+Structure:
+
+```
+1
+roles/
+2
+└── apache/
+3
+├── tasks/
+4
+├── handlers/
+5
+├── files/
+6
+├── templates/
+7
+├── vars/
+8
+└── defaults/
+```
+
+Use role:
+
+```
+1
+- hosts: web
+2
+roles:
+3
+- apache
+```
+
+Benefits:
+
+Reusability
+Modularity
+Easy maintenance
+### 8. What are Handlers?
+
+Handlers are tasks triggered only when notified.
+
+Example:
+
+```
+1
+- name: Update config
+2
+template:
+3
+src: httpd.conf.j2
+4
+dest: /etc/httpd/conf/httpd.conf
+5
+notify:
+6
+- restart apache
+7
+
+```
+
+Handler:
+
+```
+handlers:
+2
+- name: restart apache
+3
+service:
+4
+name: httpd
+5
+state: restarted
+```
+
+Handler runs only when file changes.
+
+## 9. What are Tags?
+
+Tags run specific tasks in a playbook.
+
+Example:
+
+```
+1
+tasks:
+2
+- name: Install Apache
+3
+yum:
+4
+name: httpd
+5
+state: present
+6
+tags:
+7
+- install
+```
+
+Run:
+
+```
+ansible-playbook site.yml --tags install
+```
+
+Skip:
+
+```
+ansible-playbook site.yml --skip-tags install
+```
+10. What is Idempotency?
+
+Idempotency means running the same playbook multiple times produces the same result.
+
+Example:
+
+```
+1
+- yum:
+2
+name: httpd
+3
+state: present
+4
+
+```
+
+First run:
+
+```
+Package Installed
+```
+
+Second run:
+
+```
+No Changes
+```
+
+This ensures consistency and prevents unnecessary actions.
+
+11. How does Ansible connect to servers?
+
+Ansible uses:
+
+SSH (Linux/Unix)
+WinRM (Windows)
+
+SSH example:
+
+```
+1
 ansible all -m ping
 ```
 
-### Playbook
+Inventory:
 
-Used for complex, repeatable automation tasks.
-
-```bash
-ansible-playbook webserver.yml
+```
+1
+web1 ansible_host=192.168.1.10 ansible_user=ec2-user
+2
 ```
 
-### Difference
+Authentication:
 
-| Ad Hoc | Playbook |
-|----------|----------|
-| One-time task | Reusable automation |
-| Command line | YAML file |
-| Quick execution | Complex workflows |
+SSH Key
+Username/Password
 
-### Interview Answer
+### 12. What is Dynamic Inventory?
 
-Ad Hoc commands are used for quick one-time operations, while Playbooks are YAML-based 
+Dynamic Inventory automatically fetches hosts from cloud providers.
+
+Example Sources:
+
+AWS EC2
+Azure VMs
+GCP Instances
+VMware
+
+Instead of:
+
+INI
+1
+[web]
+2
+10.0.0.1
+3
+10.0.0.2
+```
+
+Ansible queries the cloud and discovers hosts automatically.
+
+Example:
+
+```
+1
+ansible-inventory -i aws_ec2.yml --list
+```
+13. Difference between Variables and Facts?
+Variables
+
+User-defined.
+
+```
+1
+app_port: 8080
+```
+Facts
+
+System-generated.
+
+```
+1
+ansible_hostname
+2
+ansible_os_family
+3
+ansible_default_ipv4.address
+```
+Example:
+
+```
+1
+- debug:
+2
+msg: "{{ app_port }}"
+Show more lines
+```
+1
+- debug:
+2
+msg: "{{ ansible_hostname }}"
+```
+14. How do you secure passwords?
+
+Best practices:
+
+Use Ansible Vault
+```
+1
+ansible-vault encrypt secrets.yml
+```
+Store variables
+```
+1
+db_password: MySecretPassword
+2
+ 
+```
+
+Encrypted inside Vault.
+
+Use external secret managers
+HashiCorp Vault
+AWS Secrets Manager
+Azure Key Vault
+
+### 15. What is become?
+
+Used for privilege escalation.
+
+Equivalent to:
+
+```
+sudo
+```
+
+Example:
+
+```
+1
+- hosts: web
+2
+ 
+3
+become: yes
+4
+ 
+5
+tasks:
+6
+- service:
+7
+name: httpd
+8
+state: restarted
+```
+
+Run as root:
+
+```
+sudo
+```
+
+behind the scenes.
+
+16. What is Jinja2 Template?
+
+Jinja2 allows dynamic file generation.
+
+Template:
+```
+Jinja
+1
+ServerName {{ hostname }}
+2
+ 
+3
+Port {{ app_port }}
+```
+
+Playbook:
+
+```
+1
+- template:
+2
+src: app.conf.j2
+3
+dest: /etc/app.conf
+```
+
+Generated file:
+
+```
+ServerName web01
+2
+Port 8080
+3
+ 
+```
+### 17. What is Ansible Galaxy?
+
+Ansible Galaxy is a repository for sharing roles and collections.
+
+Install role:
+
+```
+ansible-galaxy role install geerlingguy.apache
+```
+
+Install collection:
+
+```
+ansible-galaxy collection install community.general
+```
+18. How do you run a playbook on specific hosts?
+Inventory Group
+```
+ansible-playbook site.yml --limit webservers
+```
+Single Host
+```
+ansible-playbook site.yml --limit web01
+```
+Multiple Hosts
+```
+ansible-playbook site.yml --limit "web01,web02"
+```
+19. How do you troubleshoot playbook failures?
+Increase Verbosity
+```
+ansible-playbook site.yml -v
+```
+
+More details:
+
+```
+ansible-playbook site.yml -vvv
+```
+
+Maximum:
+
+```
+ansible-playbook site.yml -vvvv
+2
+``
+```
+Check Connectivity
+```
+1
+ansible all -m ping
+```
+Syntax Validation
+```
+1
+ansible-playbook site.yml --syntax-check
+```
+Dry Run
+```
+ansible-playbook site.yml --check
+```
+Debug Variables
+```
+1
+- debug:
+2
+var: ansible_hostname
+```
+20. How do you deploy applications using Ansible?
+
+Typical workflow:
+
+Install Packages
+```
+1
+- yum:
+2
+name: java-17-openjdk
+3
+state: present
+```
+Copy Artifact
+```
+1
+- copy:
+2
+src: app.jar
+3
+dest: /opt/app/app.jar
+```
+Configure Application
+```
+1
+- template:
+2
+src: application.properties.j2
+3
+dest: /opt/app/application.properties
+```
+Start Service
+```
+1
+- service:
+2
+name: app
+3
+state: started
+```
+
+Deployment Flow:
+
+```
+Build Application
+2
+↓
+3
+Copy Artifact
+4
+↓
+5
+Configure
+6
+↓
+7
+Start Service
+8
+↓
+9
+Validate
+```
+21. Ansible Command Cheat Sheet
+Inventory
+```
+ansible-inventory --list
+2
+ansible-inventory --graph
+```
+Connectivity
+```
+ansible all -m ping
+```
+Run Command
+```
+ansible all -m command -a "uptime"
+```
+Run Shell
+```
+ansible all -m shell -a "df -h"
+```
+Copy File
+```
+ansible all -m copy -a "src=test.txt dest=/tmp/test.txt"
+```
+Install Package
+```
+ansible all -m yum -a "name=httpd state=present"
+```
+Gather Facts
+```
+ansible all -m setup
+```
+Execute Playbook
+```
+ansible-playbook site.yml
+```
+Syntax Check
+```
+ansible-playbook site.yml --syntax-check
+```
+Dry Run
+```
+ansible-playbook site.yml --check
+```
+Run with Tags
+```
+ansible-playbook site.yml --tags install
+```
+Limit Hosts
+```
+ansible-playbook site.yml --limit webservers
+```
+Vault
+```
+ansible-vault create secrets.yml
+2
+ansible-vault edit secrets.yml
+3
+ansible-vault encrypt secrets.yml
+4
+ansible-vault decrypt secrets.yml
+```
+Galaxy
+```
+ansible-galaxy role install geerlingguy.apache
+2
+ansible-galaxy collection install community.general
+```
+Verbose Debugging
+```
+ansible-playbook site.yml -v
+2
+ansible-playbook site.yml -vv
+3
+ansible-playbook site.yml -vvv
+4
+ansible-playbook site.yml -vvvv
+```
+### Quick Interview Summary
+Ansible = Agentless automation tool.
+Playbook = Reusable YAML automation.
+Inventory = List of managed hosts.
+Facts = System information gathered from hosts.
+Roles = Reusable playbook components.
+Handlers = Triggered tasks executed on change.
+Vault = Encrypts secrets.
+Tags = Run selected tasks.
+Idempotency = Same result after multiple runs.
+Become = Privilege escalation (sudo).
+Jinja2 = Dynamic templates.
+Galaxy = Repository for roles and collections.
+Dynamic Inventory = Auto-discovered hosts from cloud providers.
