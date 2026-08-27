@@ -2007,3 +2007,150 @@ Docker Push Success
 ### Q. 
 
 Code is pushed to GitHub, GitHub Actions triggers the pipeline, Maven builds and tests the application, JaCoCo generates coverage, SonarQube validates code quality, the JAR is published to JFrog Artifactory, a Docker image is built and scanned, pushed to JFrog Container Registry, then deployed sequentially to DEV, QA, UAT, and PROD Kubernetes environments using Helm with approval gates between environments. Health checks validate deployments, and automatic rollback is performed if production deployment fails.
+
+
+What is GitHub Actions?
+
+A CI/CD platform integrated with GitHub to automate build, test, deployment, and workflow processes.
+
+What is a Workflow?
+
+A YAML-defined automation stored under:
+
+Plain Text
+1
+.github/workflows/
+Show more lines
+What is a Job?
+
+A group of steps executed on a runner.
+
+What is a Runner?
+
+A server that executes workflow jobs.
+
+What is an Action?
+
+A reusable automation component.
+
+How do you store passwords?
+
+Using:
+
+Plain Text
+1
+GitHub Secrets
+Show more lines
+How do you trigger a workflow manually?
+YAML
+1
+workflow_dispatch
+Show more lines
+How do you deploy to Kubernetes?
+YAML
+1
+kubectl apply -f deployment.yaml
+Show more lines
+
+inside the workflow.
+
+How do you run Terraform?
+YAML
+1
+terraform init
+2
+terraform plan
+3
+terraform apply
+Show more lines
+
+inside a GitHub Actions workflow.
+
+GitHub Actions Cheat Sheet
+Shell
+1
+# Workflow location
+2
+.github/workflows/*.yml
+3
+ 
+4
+# Manual trigger
+5
+workflow_dispatch
+6
+ 
+7
+# Push trigger
+8
+on: push
+9
+ 
+10
+# PR trigger
+11
+on: pull_request
+12
+ 
+13
+# Setup Java
+14
+actions/setup-java
+15
+ 
+16
+# Checkout Code
+17
+actions/checkout
+18
+ 
+19
+# Upload Artifact
+20
+actions/upload-artifact
+21
+ 
+22
+# Download Artifact
+23
+actions/download-artifact
+24
+ 
+25
+# Terraform
+26
+hashicorp/setup-terraform
+27
+ 
+28
+# Docker Build
+29
+docker build
+30
+ 
+31
+# Kubernetes Deploy
+32
+kubectl apply -f
+33
+ 
+34
+# Use Secret
+35
+${{ secrets.NAME }}
+36
+ 
+37
+# Use Variable
+38
+${{ vars.NAME }}
+39
+ 
+40
+# Self Hosted Runner
+41
+runs-on: self-hosted
+Show more lines
+Interview One-Line Answer
+
+GitHub Actions is GitHub's built-in CI/CD platform that uses YAML workflows to automate software build, test, security checks, infrastructure provisioning, and application deployments based on events such as code pushes, pull requests, schedules, or manual triggers.
