@@ -740,3 +740,271 @@ git push origin feature-payment
 3. git push uploads local commits to the remote repository.
 
 4. git checkout is used to switch branches or restore files (modern Git often uses git switch for branch changes).
+
+### I believe you mean Git Branch Protection (sometimes called branch protection rules).
+
+Branch protection prevents developers from directly making risky changes to important branches such as main, master, release, or production.
+
+### Why Use Branch Protection?
+
+Protect critical branches from:
+
+Direct pushes
+Accidental deletions
+Force pushes
+Unreviewed code
+Failed CI/CD deployments
+Common Enterprise Setup
+```
+main
+2
+├── Protected
+3
+├── No direct push
+4
+├── PR required
+5
+├── Code review required
+6
+└── CI checks required
+7
+```
+
+Workflow:
+
+```
+Feature Branch
+2
+↓
+3
+Pull Request
+4
+↓
+5
+Code Review
+6
+↓
+7
+Build Validation
+8
+↓
+9
+Merge to Main
+```
+How to Configure Branch Protection in GitHub
+
+Navigate to:
+
+```
+Repository
+2
+→ Settings
+3
+→ Branches
+4
+→ Add Rule
+```
+
+Example branch:
+
+```
+main
+```
+
+or
+
+```
+release/*
+```
+Recommended Protection Rules
+1. Require Pull Request Reviews
+
+Enable:
+
+```
+✓ Require a pull request before merging
+2
+✓ Require approvals
+```
+
+Example:
+
+```
+Required Approvals = 2
+```
+2. Require Status Checks
+
+Ensure builds pass before merge.
+
+```
+✓ Require status checks to pass
+```
+
+Examples:
+
+```
+Build
+2
+Unit Tests
+3
+SonarQube
+4
+Security Scan
+```
+
+GitHub blocks merge until all checks succeed.
+
+3. Require Conversation Resolution
+```
+✓ Require conversation resolution
+```
+
+Prevents merging while review comments remain unresolved.
+
+4. Restrict Direct Pushes
+```
+✓ Do not allow bypassing rules
+```
+
+Result:
+
+❌
+
+```
+git push origin main
+```
+
+Allowed only through PR process.
+
+5. Prevent Force Pushes
+```
+✓ Block force pushes
+```
+
+Stops:
+
+```
+git push --force
+```
+
+which can overwrite history.
+
+6. Prevent Branch Deletion
+```
+✓ Prevent deletions
+```
+
+Protects important branches from accidental removal.
+
+7. Require Linear History
+
+Enable:
+
+```
+✓ Require linear history
+```
+
+Uses:
+
+```
+rebase
+```
+
+instead of unnecessary merge commits.
+
+8. Restrict Who Can Push
+
+Example:
+
+```
+Release Managers
+2
+DevOps Team
+```
+
+Only authorized users can push or merge.
+
+Example Enterprise Rule
+Main Branch
+```
+Branch: main
+2
+ 
+3
+✓ Pull Request Required
+4
+✓ 2 Approvals Required
+5
+✓ SonarQube Pass
+6
+✓ Security Scan Pass
+7
+✓ Build Pass
+8
+✓ No Force Push
+9
+✓ No Deletion
+10
+✓ Require Conversation Resolution
+```
+Release Branch Protection
+```
+release/*
+```
+
+Rules:
+
+```
+✓ Release Manager Approval
+2
+✓ Successful Deployment Validation
+3
+✓ Tagged Release Required
+```
+Production Deployment Flow
+```
+Developer
+2
+↓
+3
+Feature Branch
+4
+↓
+5
+Pull Request
+6
+↓
+7
+2 Approvals
+8
+↓
+9
+GitHub Actions Validation
+10
+↓
+11
+Merge to Main
+12
+↓
+13
+Deploy DEV
+14
+↓
+15
+QA Approval
+16
+↓
+17
+UAT Approval
+18
+↓
+19
+PROD Approval
+20
+ 
+```
+### Interview Answer
+
+### What is Git Branch Protection?
+
+Branch Protection Rules in GitHub protect critical branches such as main and release. They enforce controls like mandatory pull requests, code reviews, successful CI/CD checks, prevention of force pushes and branch deletion, and restricted access. In enterprise projects, we typically require at least two approvals, successful SonarQube and security scans, and passing build validations before allowing a merge into the main branch.
