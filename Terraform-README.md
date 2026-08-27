@@ -2347,3 +2347,69 @@ module "eks" {
 ```
 ### Q. 
 An external module is a reusable Terraform module stored outside the current project, typically in the Terraform Registry, GitHub, or a private Git repository. It is called from the root module using the module block and a source attribute. During terraform init, Terraform downloads the module and makes its resources available. Outputs from the module can be referenced using module.<module_name>.<output_name>. For production environments, modules should be versioned using tags or specific releases.
+
+### terraform plan -generate-config-out=generated_resource.tf
+
+This feature (introduced with Terraform's import workflow enhancements) can automatically generate Terraform configuration for resources that are being imported.
+## Real-Time Example
+Step 1: Define Import Block
+```
+import {
+  to = aws_instance.web
+  id = "i-0123456789abcdef"
+}
+```
+Step 2: Run Plan
+```
+terraform plan -generate-config-out=generated_resource.tf
+```
+Terraform:
+
+Connects to AWS.
+Reads EC2 configuration.
+Generates HCL code.
+Saves it to:
+
+```
+generated_resource.tf
+```
+Step 3: Review Generated File
+
+Check:
+```
+cat generated_resource.tf
+```
+Review and clean up unnecessary attributes. copy and past into main.tf file and delete generated_resource.tf
+run below command
+```
+terraform import aws_instance.web i-0123456789abcdef
+```
+its will create terraform.tfstate file existing resource
+run :
+```
+terraform apply 
+```
+this no changes made
+#### Complete Workflow
+```
+Existing AWS Resource
+          │
+          ▼
+      Import Block
+          │
+          ▼
+terraform plan
+-generate-config-out
+          │
+          ▼
+generated_resource.tf
+          │
+          ▼
+Review Configuration
+          │
+          ▼
+terraform apply
+          │
+          ▼
+Resource Managed by Terraform
+```
