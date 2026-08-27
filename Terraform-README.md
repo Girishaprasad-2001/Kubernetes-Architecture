@@ -1653,3 +1653,17 @@ Terraform Import allows you to bring existing cloud resources (that weren’t cr
 This creates drift between Terraform State and Actual Infrastructure.
 
 If someone manually deletes one of the Terraform-managed instances from the AWS Console, the infrastructure drifts from the Terraform state. When I run terraform plan, Terraform detects that the resource is missing and shows it will be recreated. Running terraform apply restores the infrastructure to the desired state defined in the code. This is one of the key benefits of Terraform's declarative model: it continuously tries to make the actual state match the desired state.
+
+### Fix #1 (Recommended)
+```
+terraform apply
+```
+Terraform will to reach the desired count of 5. Terraform automatically recreates the missing instance.
+
+### Fix #2: Refresh and Apply
+```
+terraform plan -refresh-only or terraform refresh
+terraform apply
+```
+Terraform recreates the missing resource.
+
