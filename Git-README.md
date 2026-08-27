@@ -699,3 +699,44 @@ Rebase moves branch commits on top of another branch, creating a linear history 
 | **Collaboration** | Easier collaboration | Cleaner history |
 | **Risk Level** | Non-destructive | Potentially destructive |
 
+
+### Quick Comparison
+
+| Command | Action |
+| :--- | :--- |
+| `git fetch` | Downloads changes only |
+| `git pull` | Downloads + merges changes |
+| `git push` | Uploads local commits to remote |
+| `git checkout` | Switches branches or restores files |
+
+### Real-Time Workflow
+
+```
+# Download latest changes
+git fetch origin
+
+# Review differences
+git log HEAD..origin/main --oneline
+
+# Merge changes
+git pull origin main
+
+# Create feature branch
+git checkout -b feature-payment
+
+# Make code changes
+git add .
+git commit -m "Added payment API"
+
+# Push feature branch
+git push origin feature-payment
+```
+### Interview Answer
+
+1. git fetch downloads changes from the remote repository but does not merge them.
+
+2. git pull downloads and merges changes into the current branch.
+
+3. git push uploads local commits to the remote repository.
+
+4. git checkout is used to switch branches or restore files (modern Git often uses git switch for branch changes).
