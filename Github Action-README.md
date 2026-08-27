@@ -360,4 +360,232 @@ Terraform Apply
         ↓
 Deployment Complete
 ```
+## GitHub Actions CI/CD Flow (End-to-End)
 
+A typical GitHub Actions CI/CD pipeline automates the process from code commit to production deployment.
+
+High-Level Flow
+```
+Developer Code Commit
+          │
+          ▼
+     Git Push/PR
+          │
+          ▼
+ GitHub Actions Trigger
+          │
+          ▼
+      Checkout Code
+          │
+          ▼
+ Build Application
+          │
+          ▼
+ Run Unit Tests
+          │
+          ▼
+ Security/Code Scan
+          │
+          ▼
+ Create Artifact
+          │
+          ▼
+ Deploy to Dev
+          │
+          ▼
+ Integration Testing
+          │
+          ▼
+ Approval Gate
+          │
+          ▼
+ Deploy to Production
+          │
+          ▼
+ Monitoring & Validation
+```
+Sample CI/CD Workflow
+```
+name: CI-CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build Application
+        run: mvn clean package
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-build
+          path: target/*.jar
+
+  deploy-dev:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-build
+
+      - name: Deploy to Dev
+        run: echo "Deploying to Dev Environment"
+
+  deploy-prod:
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Deploy to Production
+        run: echo "Deploying to Production"
+```
+Terraform CI/CD Flow Using GitHub Actions
+
+Most DevOps interviews focus on this scenario.
+
+Flow
+```
+Developer Changes Terraform Code
+               │
+               ▼
+          Pull Request
+               │
+               ▼
+        Terraform fmt
+               │
+               ▼
+      Terraform validate
+               │
+               ▼
+        Terraform plan
+               │
+               ▼
+     Review & Approval
+               │
+               ▼
+          Merge Main
+               │
+               ▼
+         Terraform Apply
+               │
+               ▼
+    Infrastructure Created
+```
+Example Workflow
+```
+name: Terraform Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+```
+Azure Deployment CI/CD Flow
+```
+Developer Commit
+        │
+        ▼
+Build Application
+        │
+        ▼
+Run Tests
+        │
+        ▼
+Create Artifact
+        │
+        ▼
+Azure Login
+        │
+        ▼
+Deploy to App Service/AKS
+        │
+        ▼
+Smoke Test
+        │
+        ▼
+Production Release
+```
+Example Azure Login:
+```
+- name: Azure Login
+  uses: azure/login@v2
+  with:
+    creds: ${{ secrets.AZURE_CREDENTIALS }}
+```
+### Best Practices
+Branch Strategy
+```
+feature/*
+    │
+    ▼
+develop
+    │
+    ▼
+main
+```
+Use Environment Approval
+```
+environment: production
+```
+Before production deployment:
+```
+Approve Deployment
+       │
+       ▼
+Deploy
+```
+Store Secrets Securely
+```
+${{ secrets.AZURE_CLIENT_ID }}
+${{ secrets.AWS_ACCESS_KEY_ID }}
+```
+
+Never hardcode credentials.
+### Interview Answer (2-Minute)
+
+"In GitHub Actions CI/CD, a workflow is triggered when code is pushed or a pull request is created. The pipeline checks out the code, performs build and test stages, runs security and quality scans, generates artifacts, and stores them. After successful validation, the deployment stage is triggered. For production environments, approval gates can be configured using GitHub Environments. In Terraform projects, the pipeline typically runs terraform fmt, validate, plan, and apply. Secrets are securely stored in GitHub Secrets, and deployments can run on GitHub-hosted or self-hosted runners."
