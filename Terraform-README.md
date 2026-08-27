@@ -1072,3 +1072,512 @@ A reusable collection of Terraform configurations used to standardize and simpli
 ## Taint / Replace
 
 Used to force Terraform to recreate a resource. terraform taint is the older method, while terraform apply -replace is the recommended modern approach.
+
+## 1. Difference between count and for_each
+count
+
+Creates multiple resource instances based on a number.
+
+Terraform
+```
+1
+resource "aws_instance" "server" {
+2
+count = 3
+3
+}
+4
+ 
+```
+
+Access:
+
+Terraform
+```
+1
+aws_instance.server[0]
+```
+for_each
+
+Creates resources using unique keys from a map or set.
+
+Terraform
+```
+1
+resource "aws_s3_bucket" "bucket" {
+2
+for_each = toset(["dev", "qa", "prod"])
+3
+}
+```
+
+Access:
+
+Terraform
+```
+1
+aws_s3_bucket.bucket["dev"]
+```
+## Interview Answer
+count uses numeric indexes (0,1,2...)
+for_each uses unique keys
+If one resource is removed in count, indexes shift and may cause unnecessary recreation.
+for_each maintains stable resource identities and is preferred for production use.
+## 2. How does Terraform state work?
+
+Terraform State (terraform.tfstate) stores mappings between Terraform configuration and real infrastructure.
+
+Example:
+
+```
+EC2 Instance
+2
+↔
+3
+terraform.tfstate
+```
+
+Terraform uses state to:
+
+Track existing resources
+Detect configuration drift
+Generate execution plans
+Avoid recreating resources unnecessarily
+### Interview Answer
+
+"Terraform state is a JSON file that stores infrastructure metadata and resource mappings. Terraform compares configuration with the state file and actual infrastructure to determine what changes need to be applied."
+
+### 3. What is State Locking?
+
+State locking prevents multiple users from modifying the same state file simultaneously.
+
+Without locking:
+
+```
+User A → Apply
+2
+User B → Apply
+```
+
+Result:
+
+State corruption
+Resource conflicts
+
+With locking:
+
+```
+User A -> Gets Lock
+2
+User B -> Waits
+```
+Common Locking Mechanisms
+AWS: DynamoDB
+Azure: Storage Account Lease
+Terraform Cloud: Built-in Locking
+### Interview Answer
+
+"State locking ensures only one Terraform operation can modify the state file at a time, preventing race conditions and state corruption."
+
+### 4. What happens if the state file is deleted?
+
+Terraform loses tracking of resources.
+
+Consequences:
+
+Resources still exist in cloud
+Terraform believes resources don't exist
+Next terraform apply may attempt to recreate resources
+
+Recovery options:
+
+Restore backup state
+Recover remote state
+Re-import resources
+```
+terraform import
+```
+## Interview Answer
+
+"If the state file is deleted, Terraform loses knowledge of existing resources. Infrastructure remains intact, but Terraform may try to recreate resources unless the state is restored or resources are imported again."
+
+### 5. Explain Remote Backend
+
+Remote backend stores Terraform state remotely instead of locally.
+
+Example:
+
+Terraform
+```
+1
+terraform {
+2
+backend "s3" {
+3
+bucket = "tf-state-bucket"
+4
+key = "prod/state.tfstate"
+5
+region = "us-east-1"
+6
+}
+7
+}
+```
+
+Benefits:
+
+Team collaboration
+State locking
+Versioning
+Disaster recovery
+Common Backends
+S3
+Azure Storage
+GCS
+Terraform Cloud
+### Interview Answer
+
+"A remote backend stores Terraform state in a centralized location, enabling collaboration, locking, version control, and higher availability."
+
+## 6. What are Provider Aliases?
+
+Provider aliases allow multiple configurations of the same provider.
+
+Example:
+
+Terraform
+```
+1
+provider "aws" {
+2
+region = "us-east-1"
+3
+}
+4
+ 
+5
+provider "aws" {
+6
+alias = "west"
+7
+region = "us-west-2"
+8
+}
+```
+
+Usage:
+
+Terraform
+```
+1
+resource "aws_s3_bucket" "west_bucket" {
+2
+provider = aws.west
+3
+}
+```
+### Interview Answer
+
+"Provider aliases allow Terraform to interact with multiple AWS regions or accounts from the same configuration."
+
+7. Difference between Data Source and Resource
+Resource
+
+Creates or manages infrastructure.
+
+Terraform
+```
+1
+resource "aws_instance" "server" {
+2
+}
+```
+Data Source
+
+Reads existing infrastructure.
+
+Terraform
+```
+1
+data "aws_vpc" "default" {
+2
+default = true
+3
+}
+```
+### Interview Answer
+Resource	Data SourceCreates/Updates infrastructure	Reads infrastructure
+Managed by Terraform	Not managed
+Can modify cloud resources	Read-only
+8. Explain Lifecycle Block
+
+Controls Terraform resource behavior.
+
+Example:
+
+Terraform
+```
+1
+lifecycle {
+2
+create_before_destroy = true
+3
+prevent_destroy = true
+4
+ignore_changes
+```
+Important Options
+create_before_destroy
+
+Creates new resource before deleting old one.
+
+prevent_destroy
+
+Blocks accidental deletion.
+
+ignore_changes
+
+Ignores specified changes.
+
+replace_triggered_by
+
+Forces recreation based on another object's changes.
+
+### Interview Answer
+
+"The lifecycle block customizes how Terraform handles resource creation, updates, and deletion to reduce downtime and prevent accidental destruction."
+
+### 9. How do you handle multiple environments?
+Method 1: Workspaces
+```
+terraform workspace new dev
+2
+terraform workspace new qa
+3
+terraform workspace new prod
+```
+Method 2: Separate Folders
+```
+environments/
+2
+├─ dev
+3
+├─ qa
+4
+└─ prod
+```
+Method 3: Terragrunt (Enterprise Preferred)
+
+Shared modules with environment-specific variables.
+
+### Interview Answer
+
+"I typically use reusable modules with separate state files per environment. In enterprise environments, Terragrunt or environment-specific directories are commonly used."
+
+### 10. What is Terragrunt and Why Use It?
+
+Terragrunt is a wrapper around Terraform.
+
+Benefits:
+
+DRY principle
+Centralized backend config
+Dependency management
+Environment management
+
+Example:
+
+Terraform
+```
+1
+include {
+2
+path = find_in_parent_folders()
+3
+}
+```
+## Interview Answer
+
+"Terragrunt reduces code duplication by centralizing backend, provider, and module configurations, making multi-environment Terraform deployments easier."
+
+## 11. How do you import existing resources?
+
+Import existing infrastructure into Terraform state.
+
+Example:
+
+```
+terraform import aws_instance.web i-123456789
+```
+
+Steps:
+
+Create resource block
+Run import
+Verify state
+```
+terraform state list
+```
+Run plan
+```
+terraform plan
+```
+### Interview Answer
+
+"Terraform import allows existing cloud resources to be brought under Terraform management without recreating them."
+
+### 12. How do you secure Terraform secrets?
+Don't Store Secrets In
+
+❌ Terraform code
+
+❌ Git repositories
+
+❌ Local variables
+
+Use Secret Managers
+Azure Key Vault
+AWS Secrets Manager
+HashiCorp Vault
+Google Secret Manager
+
+Example:
+
+Terraform
+```
+1
+data "aws_secretsmanager_secret_version" "db" {
+2
+secret_id = "db-password"
+3
+}
+```
+Sensitive Variables
+Terraform
+```
+1
+variable "password" {
+2
+sensitive = true
+3
+}
+```
+### Interview Answer
+
+"I use secret management tools like Azure Key Vault, Vault, or Secrets Manager and mark Terraform variables as sensitive. Secrets should never be hardcoded or committed to source control."
+
+### 13. What are Dynamic Blocks?
+
+Dynamic blocks generate nested configurations dynamically.
+
+Example:
+
+Terraform
+```
+1
+dynamic "ingress" {
+2
+for_each = var.rules
+3
+ 
+4
+content {
+5
+from_port = ingress.value.port
+6
+to_port = ingress.value.port
+7
+protocol = "tcp"
+8
+}
+9
+}
+```
+Use Cases
+Security Groups
+Load Balancer Rules
+Route Tables
+## Interview Answer
+
+"Dynamic blocks help create repeated nested configurations programmatically and reduce code duplication."
+
+### 14. Explain Dependency Graph
+
+Terraform builds a dependency graph before execution.
+
+Example:
+
+```
+VPC
+2
+↓
+3
+Subnet
+4
+↓
+5
+EC2
+```
+
+Terraform determines:
+
+Creation order
+Deletion order
+Parallel execution opportunities
+
+Visualize:
+
+```
+terraform graph
+```
+### Interview Answer
+
+"Terraform creates a dependency graph using resource references and dependencies. This graph determines the correct execution order and allows safe parallel operations."
+
+### 15. How does Terraform Cloud differ from Open-Source Terraform?
+Open Source Terraform
+Local execution
+Local/remote state
+Community support
+No built-in governance
+Terraform Cloud
+Remote execution
+State management
+Team collaboration
+RBAC
+Policy as Code (Sentinel)
+Cost estimation
+### Interview Answer
+
+"Terraform Cloud extends open-source Terraform with collaboration, remote runs, governance, RBAC, state management, policy enforcement, and cost analysis capabilities."
+
+Bonus Question: What are the Terraform commands used daily?
+```
+terraform init
+2
+terraform fmt
+3
+terraform validate
+4
+terraform plan
+5
+terraform apply
+6
+terraform destroy
+7
+terraform show
+8
+terraform output
+9
+terraform state list
+10
+terraform state show
+11
+terraform import
+12
+terraform workspace list
+```
+
+### One-line interview summary:
+ "Terraform manages infrastructure through configuration files and state management. Advanced concepts include remote state, state locking, modules, provider aliases, dynamic blocks, lifecycle rules, Terragrunt, and Terraform Cloud for enterprise-scale deployments."
