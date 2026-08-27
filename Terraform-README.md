@@ -1581,3 +1581,32 @@ terraform workspace list
 
 ### One-line interview summary:
  "Terraform manages infrastructure through configuration files and state management. Advanced concepts include remote state, state locking, modules, provider aliases, dynamic blocks, lifecycle rules, Terragrunt, and Terraform Cloud for enterprise-scale deployments."
+
+### Interview Answer (Short)
+
+1. Terraform Import is used to bring an existing resource into Terraform state so Terraform can manage its lifecycle.
+
+2. Data Source is used to read information about existing resources and consume their attributes without bringing them under Terraform management.
+
+Example:
+
+Existing EC2 → Want Terraform to manage it → Import
+Existing VPC → Just need VPC ID to create subnet → Data Source
+## 1. Terraform Import
+
+Purpose: Bring an existing resource under Terraform management.
+
+Scenario
+
+Suppose an EC2 instance was created manually from the AWS Console.
+
+## Important
+
+Import only updates the Terraform state file.
+
+It does not automatically generate Terraform code.
+
+After importing, your .tf files must match the actual resource configuration.
+## 2. Data Source
+
+Purpose: Read information about existing resources without managing them.
