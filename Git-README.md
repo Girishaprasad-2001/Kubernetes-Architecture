@@ -560,7 +560,7 @@ main
 │
 11
 └── hotfix/critical-bug
-Show more lines
+```
 Typical Flow
 ```
 git checkout develop
