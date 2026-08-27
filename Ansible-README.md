@@ -1448,16 +1448,16 @@ ansible-playbook site.yml -vvv
 ansible-playbook site.yml -vvvv
 ```
 ### Quick Interview Summary
-Ansible = Agentless automation tool.
-Playbook = Reusable YAML automation.
-Inventory = List of managed hosts.
-Facts = System information gathered from hosts.
-Roles = Reusable playbook components.
-Handlers = Triggered tasks executed on change.
-Vault = Encrypts secrets.
-Tags = Run selected tasks.
-Idempotency = Same result after multiple runs.
-Become = Privilege escalation (sudo).
-Jinja2 = Dynamic templates.
-Galaxy = Repository for roles and collections.
-Dynamic Inventory = Auto-discovered hosts from cloud providers.
+1. Ansible = Agentless automation tool.
+2. Playbook = Reusable YAML automation.
+3. Inventory = List of managed hosts.
+4. Facts = System information gathered from hosts.
+5. Roles = Reusable playbook components.
+6. Handlers = Triggered tasks executed on change.
+7. Vault = Encrypts secrets.
+8. Tags = Run selected tasks.
+9. Idempotency = Same result after multiple runs.
+10. Become = Privilege escalation (sudo).
+11. Jinja2 = Dynamic templates.
+12. Galaxy = Repository for roles and collections.
+13. Dynamic Inventory = Auto-discovered hosts from cloud providers.
