@@ -595,3 +595,107 @@ Merge into develop/main
 ```
 
 This covers the Git commands most commonly expected in DevOps, GitHub Actions, Azure DevOps, AWS DevOps, and senior engineer interviews.
+### Git Merge vs Git Rebase: Main Differences
+
+Both merge and rebase integrate changes from one branch into another, but they handle commit history differently.
+Example Setup
+```
+main
+
+A --- B --- C
+
+feature
+
+A --- B --- D --- E
+```
+1. Git Merge
+Command:
+```
+git checkout main
+git merge feature
+```
+Result:
+```
+A --- B --- C -------- M
+       \            /
+        D --- E ----
+```
+Here M is a merge commit.
+
+Characteristics
+
+✅ Preserves complete history
+
+✅ Shows when branches were merged
+
+✅ Safe for shared branches
+
+✅ No history rewriting
+
+❌ Creates extra merge commits
+
+❌ History can become complex
+
+### Interview Answer
+
+Merge combines two branches and creates a merge commit, preserving the exact history of both branches.
+
+2. Git Rebase
+
+Command:
+```
+git checkout feature
+git rebase main
+```
+Result:
+
+Before:
+```
+A --- B --- C    (main)
+       \
+        D --- E (feature)
+```
+```
+A --- B --- C --- D' --- E'
+```
+D and E are recreated as new commits (D', E').
+
+Then merge:
+```
+git checkout main
+git merge feature
+```
+Result:
+```
+A --- B --- C --- D' --- E'
+```
+No merge commit.
+
+Characteristics
+
+✅ Clean linear history
+
+✅ Easier to read logs
+
+✅ Preferred before creating PRs
+
+❌ Rewrites commit history
+
+❌ Can cause issues if used on shared/public branches
+
+## Interview Answer
+
+Rebase moves branch commits on top of another branch, creating a linear history without a merge commit.
+
+
+### 6. Merge vs Rebase Interview Comparison
+
+| Feature | Merge | Rebase |
+| :--- | :--- | :--- |
+| **Commit History** | Creates merge commit | No merge commit |
+| **History Modifications** | Preserves history | Rewrites history |
+| **Branch Safety** | Safe for shared branches | Avoid on shared branches |
+| **Graph Structure** | Complex graph | Linear graph |
+| **Collaboration** | Easier collaboration | Cleaner history |
+| **Risk Level** | Non-destructive | Potentially destructive |
+
