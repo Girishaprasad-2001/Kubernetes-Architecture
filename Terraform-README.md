@@ -2399,7 +2399,7 @@ terraform import aws_instance.web i-0123456789abcdef
 its will create terraform.tfstate file existing resource
 run :
 ```
-terraform apply 
+terraform plan
 ```
 this no changes made
 #### Complete Workflow
