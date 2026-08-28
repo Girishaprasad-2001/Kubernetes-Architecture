@@ -199,3 +199,28 @@ It helps organizations:
 
 Authentication = "Who are you?"
 Authorization = "What can you access?"
+
+### Azure DNS
+
+Azure DNS is a Microsoft Azure service that hosts and manages DNS domains using Azure infrastructure. DNS (Domain Name System) converts human-readable domain names (such as www.contoso.com) into IP addresses that computers use to communicate. Azure DNS supports both Public DNS and Private DNS zones.
+
+#### Key Features
+1. Host public internet-facing DNS domains.
+2. Create private DNS zones for Azure Virtual Networks (VNets).
+3. High availability using Azure's global DNS infrastructure.
+4. Integration with Azure RBAC, Activity Logs, and Azure Portal.
+5. Supports standard DNS record types such as A, AAAA, CNAME, MX, TXT, SRV, PTR, and SOA
+
+### Common DNS Record Types
+```
+| Record | Purpose |
+| :--- | :--- |
+| **A** | Maps hostname to IPv4 address |
+| **AAAA** | Maps hostname to IPv6 address |
+| **CNAME** | Alias to another hostname |
+| **MX** | Mail server record |
+| **TXT** | Text verification records |
+| **PTR** | Reverse DNS lookup |
+| **SRV** | Service location |
+| **SOA** | Zone authority information |
+```
