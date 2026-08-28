@@ -84,8 +84,8 @@ Operational monitoring views
 
 #### Q2: Difference between Azure Monitor and Application Insights?
 
-Azure Monitor = Monitoring platform.
-Application Insights = Application Performance Monitoring (APM) component within Azure Monitor.
+. Azure Monitor = Monitoring platform.
+. Application Insights = Application Performance Monitoring (APM) component within Azure Monitor.
 
 #### Q3: What is Log Analytics?
 
