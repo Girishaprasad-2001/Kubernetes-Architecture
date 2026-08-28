@@ -212,7 +212,7 @@ Azure DNS is a Microsoft Azure service that hosts and manages DNS domains using 
 5. Supports standard DNS record types such as A, AAAA, CNAME, MX, TXT, SRV, PTR, and SOA
 
 ### Common DNS Record Types
-```
+
 | Record | Purpose |
 | :--- | :--- |
 | **A** | Maps hostname to IPv4 address |
@@ -223,4 +223,4 @@ Azure DNS is a Microsoft Azure service that hosts and manages DNS domains using 
 | **PTR** | Reverse DNS lookup |
 | **SRV** | Service location |
 | **SOA** | Zone authority information |
-```
+
