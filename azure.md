@@ -306,23 +306,23 @@ Can route traffic to:
 
 This supports hybrid-cloud architectures.
 
-### Traffic Routing Methods
-1. Priority Routing (Failover)
+## Traffic Routing Methods
+### 1. Priority Routing (Failover)
 
 Primary endpoint receives all traffic.
-2. Performance Routing
+### 2. Performance Routing
 
 Routes users to the endpoint with the lowest latency.
-3. Weighted Routing
+### 3. Weighted Routing
 
 Traffic distribution based on assigned weights.
-4. Geographic Routing
+### 4. Geographic Routing
 
 Routes users based on geographic location.
-5. Subnet Routing
+### 5. Subnet Routing
 
 Routes traffic based on user IP address ranges
-6. Multi-Value Routing
+### 6. Multi-Value Routing
 
 Returns multiple healthy endpoints in DNS responses for better availability
 
