@@ -1,5 +1,5 @@
 
-
+## Azure App Service
 
 Azure App Service is a fully managed Platform as a Service (PaaS) offering in Microsoft Azure that allows you to build, deploy, host, and scale web applications, REST APIs, and mobile back ends without managing servers or infrastructure. It supports .NET, Java, Node.js, Python, PHP, and custom containers on both Windows and Linux.
 
