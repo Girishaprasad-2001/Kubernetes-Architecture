@@ -101,3 +101,69 @@ Configuration that defines what data is collected, transformed, and where it is 
 2. Log Alerts
 3. Activity Log Alerts
 4. Smart Detection Alerts
+
+## Azure Log Analytics
+
+Log Analytics is an Azure service used to collect, store, query, and analyze log data from Azure resources, virtual machines, applications, and other connected services. It is a core component of Azure Monitor and stores data in a Log Analytics Workspace, where you can analyze it using Kusto Query Language (KQL).
+
+### Why Use Log Analytics?
+
+Log Analytics helps you:
+
+1. Troubleshoot application and infrastructure issues.
+2. Monitor resource health and performance.
+3. Perform operational and security investigations.
+4. Create dashboards, reports, and alerts from collected logs.
+## Log Analytics Architecture
+   ```
+   Azure Resources
+VMs
+App Services
+AKS
+Azure SQL
+Storage Accounts
+     |
+     v
+Azure Monitor Agent / Resource Diagnostics
+     |
+     v
+Log Analytics Workspace
+     |
+     v
+KQL Queries
+Alerts
+Workbooks
+Dashboards
+```
+### Log Analytics Workspace
+
+A Log Analytics Workspace is the container where log data is stored and analyzed. Multiple Azure resources can send logs to the same workspace.
+
+Common data sources include:
+
+1. Azure Virtual Machines
+2. Azure App Services
+3. Azure SQL Database
+4. AKS Clusters
+5. Storage Accounts
+6. Microsoft Entra ID Logs
+7. Custom Applications
+
+### What is Log Analytics?
+
+A service within Azure Monitor that stores and analyzes log data using KQL queries.
+
+### What is a Log Analytics Workspace?
+
+A centralized repository where monitoring logs are collected and retained for analysis.
+
+### What language is used in Log Analytics?
+
+Kusto Query Language (KQL).
+
+### What is the difference between Metrics and Logs?
+Metrics: Lightweight, near real-time numerical data.
+Logs: Detailed records used for deep analysis and troubleshooting.
+#### What is the Heartbeat table used for?
+
+To verify that VMs and connected servers are actively reporting to Azure Monitor.
