@@ -197,8 +197,8 @@ It helps organizations:
 
 #### Q5: Difference between Authentication and Authorization?
 
-Authentication = "Who are you?"
-Authorization = "What can you access?"
+* Authentication = "Who are you?"
+* Authorization = "What can you access?"
 
 ### Azure DNS
 
