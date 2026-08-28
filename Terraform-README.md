@@ -2475,3 +2475,103 @@ AKS: Best for container orchestration, microservices, and advanced Kubernetes wo
 Interview Answer (2 Minutes)
 
 Azure App Service is a fully managed PaaS service that enables hosting of web applications, APIs, and containerized workloads. It supports multiple programming languages, automatic scaling, deployment slots, custom domains, SSL, and integrations with GitHub Actions and Azure DevOps. The underlying infrastructure, patching, and load balancing are managed by Azure, allowing teams to focus on application development and deployment.
+
+### Q. if one resource references another resource's attribute, Terraform already creates the dependency automatically. Use depends_on only for hidden or indirect dependencies.
+Resource Depending on Multiple Resources
+```
+resource "aws_instance" "app" {
+  ami           = "ami-123456"
+  instance_type = "t2.micro"
+
+  depends_on = [
+    aws_security_group.app_sg,
+    aws_iam_role.app_role
+  ]
+}
+```
+### Q.In Terraform, the count argument is used to create multiple instances of a resource or module from a single block.
+```
+resource "aws_instance" "server" {
+  count = 3
+
+  ami           = "ami-123456"
+  instance_type = "t2.micro"
+
+  tags = {
+    Name = "server-${count.index}"
+  }
+}
+```
+### Q . remote-exec in Terraform
+
+remote-exec is a provisioner that executes commands on a remote machine (Linux or Windows) after the resource is created.
+
+Terraform recommends using provisioners only as a last resort because they are not fully declarative.
+
+Basic Syntax
+Linux VM Example
+```
+resource "aws_instance" "web" {
+  ami           = "ami-0abcdef1234567890"
+  instance_type = "t2.micro"
+  key_name      = "my-key"
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo yum update -y",
+      "sudo yum install -y nginx",
+      "sudo systemctl start nginx"
+    ]
+  }
+
+  connection {
+    type        = "ssh"
+    user        = "ec2-user"
+    private_key = file("my-key.pem")
+    host        = self.public_ip
+  }
+}
+
+-------------
+provisioner "remote-exec" {
+  scripts = [
+    "install.sh",
+    "configure.sh"
+  ]
+}
+
+
+```
+How It Works
+1. Terraform creates the EC2 instance.
+2. Uses SSH to connect to the instance.
+3. Executes the commands specified in inline.
+4. Continues with the Terraform run.
+
+### Q. In Terraform, to create parameterized values that can be customized, you use input variables.
+
+```
+terraform apply -var="vm_name=prod-vm"
+```
+```
+variable "resource_group_name" {
+  type = string
+}
+
+variable "location" {
+  type = string
+  default = "East US"
+}
+
+variable "environment" {
+  type = string
+  default = "dev"
+}
+```
+Variables are used in Terraform to create parameterized and reusable configurations. They allow users to customize values such as resource names, locations, sizes, and environments without modifying the actual Terraform code.
+
+### Q. "I have 100 resources and want Terraform to apply 95 while skipping 5"
+
+```
+terraform apply -target=module.app
+``` 
