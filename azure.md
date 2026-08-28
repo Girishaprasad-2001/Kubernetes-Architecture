@@ -224,3 +224,29 @@ Azure DNS is a Microsoft Azure service that hosts and manages DNS domains using 
 | **SRV** | Service location |
 | **SOA** | Zone authority information |
 
+### What is Azure DNS?
+
+Azure DNS is a hosting service for DNS domains that provides name resolution using Microsoft Azure infrastructure.
+
+### Difference between Public DNS and Private DNS?
+
+##### Public DNS
+
+1. Accessible from the Internet
+2. Used for websites and public applications
+
+##### Private DNS
+
+Accessible only within linked VNets
+Used for internal resources and private endpoints
+#### What is a DNS Zone?
+
+A DNS Zone is a container that stores DNS records for a domain.
+
+### What is an A Record?
+
+Maps a hostname to an IPv4 address.
+
+### What is Azure DNS Private Resolver?
+
+A managed service that enables DNS resolution between Azure and on-premises networks without custom DNS servers.
