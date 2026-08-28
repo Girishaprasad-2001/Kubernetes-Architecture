@@ -250,3 +250,97 @@ Maps a hostname to an IPv4 address.
 ### What is Azure DNS Private Resolver?
 
 A managed service that enables DNS resolution between Azure and on-premises networks without custom DNS servers.
+
+### Azure Traffic Manager
+
+Azure Traffic Manager is a DNS-based global traffic load balancer that distributes user requests across multiple application endpoints located in different Azure regions or even outside Azure. It improves availability, performance, and disaster recovery by directing users to the best available endpoint.
+
+### How Traffic Manager Works
+
+Traffic Manager operates at the DNS layer (Layer 7).
+
+Request Flow
+```
+User Request
+      |
+      v
+DNS Query
+      |
+      v
+Azure Traffic Manager
+      |
+      +--> East US Endpoint
+      +--> West Europe Endpoint
+      +--> Southeast Asia Endpoint
+      |
+Select Best Endpoint
+      |
+      v
+User Connects Directly
+```
+Traffic Manager does not proxy traffic. It only answers DNS queries and directs clients to the selected endpoint. The client then connects directly to that endpoint.
+Key Features
+### High Availability
+
+Traffic Manager continuously monitors endpoint health and automatically redirects traffic if an endpoint becomes unavailable.
+
+### Global Load Balancing
+
+Distributes requests across multiple geographic regions for improved resiliency.
+
+### Improved Performance
+
+Routes users to the endpoint with the lowest network latency.
+
+### Disaster Recovery
+
+Provides automatic failover during application, datacenter, or regional outages.
+
+### Hybrid Support
+
+Can route traffic to:
+
+* Azure endpoints
+* On-premises applications
+* Other cloud providers
+
+This supports hybrid-cloud architectures.
+
+### Traffic Routing Methods
+1. Priority Routing (Failover)
+
+Primary endpoint receives all traffic.
+2. Performance Routing
+
+Routes users to the endpoint with the lowest latency.
+3. Weighted Routing
+
+Traffic distribution based on assigned weights.
+4. Geographic Routing
+
+Routes users based on geographic location.
+5. Subnet Routing
+
+Routes traffic based on user IP address ranges
+6. Multi-Value Routing
+
+Returns multiple healthy endpoints in DNS responses for better availability
+
+### What is Azure Traffic Manager?
+
+A DNS-based global load balancing service that routes users to the most appropriate application endpoint.
+
+### Does Traffic Manager handle application traffic?
+
+No. It only responds to DNS queries and directs clients to endpoints. Client traffic does not pass through Traffic Manager.
+
+#### What is the difference between Traffic Manager and Load Balancer?
+Traffic Manager = DNS-based global routing.
+Azure Load Balancer = Layer 4 regional load balancing.
+#### Which routing method is best for disaster recovery?
+
+Priority Routing because it supports primary-secondary failover.
+
+#### Which routing method provides the best user performance?
+
+Performance Routing because it directs users to the endpoint with the lowest latency.
