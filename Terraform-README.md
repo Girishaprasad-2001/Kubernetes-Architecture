@@ -16,7 +16,7 @@ Terraform v1.9.x
 Used to verify the installed version.
 
 2. Initialize Terraform
-``
+```
 terraform init
 ```
 
