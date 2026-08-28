@@ -167,3 +167,35 @@ Logs: Detailed records used for deep analysis and troubleshooting.
 #### What is the Heartbeat table used for?
 
 To verify that VMs and connected servers are actively reporting to Azure Monitor.
+
+## Azure Active Directory (Azure AD) / Microsoft Entra ID
+
+Azure Active Directory (Azure AD) was renamed to Microsoft Entra ID in July 2023. It is Microsoft's cloud-based Identity and Access Management (IAM) service used to manage users, groups, applications, authentication, and access to Azure, Microsoft 365, and third-party applications
+
+### What Does Microsoft Entra ID Do?
+
+It helps organizations:
+
+1. Authenticate users (verify identity).
+2. Authorize access to resources and applications.
+3. Provide Single Sign-On (SSO).
+4. Enforce Multi-Factor Authentication (MFA).
+5. Apply Conditional Access security policies.
+6. Manage identities for users, devices, and applications.
+   
+### Q1: What is Azure AD?
+ Azure AD, now called Microsoft Entra ID, is a cloud-based Identity and Access Management service that provides authentication and authorization for users, applications, and devices.
+
+### Q2: What is SSO?
+ Single Sign-On allows users to authenticate once and access multiple applications without logging in again.
+
+### Q3: What is Conditional Access?
+ A policy engine that grants or blocks access based on conditions such as user, device, location, and risk.
+
+### Q4: What is MFA?
+ A security mechanism requiring multiple verification methods before granting access.
+
+#### Q5: Difference between Authentication and Authorization?
+
+Authentication = "Who are you?"
+Authorization = "What can you access?"
