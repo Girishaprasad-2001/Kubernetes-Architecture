@@ -78,3 +78,26 @@ Interactive visualization
 Custom reports
 Performance dashboards
 Operational monitoring views
+
+### Q1: What is Azure Monitor?
+ A centralized monitoring service for collecting, analyzing, and acting upon telemetry from Azure and hybrid environments.
+
+#### Q2: Difference between Azure Monitor and Application Insights?
+
+Azure Monitor = Monitoring platform.
+Application Insights = Application Performance Monitoring (APM) component within Azure Monitor.
+
+#### Q3: What is Log Analytics?
+
+Service used to store and analyze log data using KQL queries.
+
+#### Q4: What is a Data Collection Rule (DCR)?
+
+Configuration that defines what data is collected, transformed, and where it is sent.
+
+#### Q5: What are the types of Azure Monitor alerts?
+
+1. Metric Alerts
+2. Log Alerts
+3. Activity Log Alerts
+4. Smart Detection Alerts
