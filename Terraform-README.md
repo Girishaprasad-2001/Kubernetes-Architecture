@@ -2575,3 +2575,5 @@ Variables are used in Terraform to create parameterized and reusable configurati
 ```
 terraform apply -target=module.app
 ``` 
+https://spacelift.io/blog/terraform-commands-cheat-sheet
+https://dev.to/devopsking/the-ultimate-terraform-tutorial-from-beginner-to-advanced-2024-guide-3n1o
