@@ -4238,3 +4238,6 @@ HTTPS access for users through Ingress.
 ### Interview Answer
 
 In Kubernetes, ConfigMaps store non-sensitive configuration such as environment variables, ports, and URLs. Secrets store sensitive data like passwords, API keys, and tokens, which can be mounted into Pods securely. Certificates are used for TLS authentication and encryption between Kubernetes components such as the API Server, kubelets, and etcd, and are also commonly stored as TLS Secrets for HTTPS-enabled applications and Ingress resources.
+
+# Kubernetes Service Mesh 
+Kubernetes Service Mesh is an infrastructure layer that manages service-to-service communication in a Kubernetes cluster. It uses sidecar proxies to provide traffic management, security (mTLS), observability, retries, load balancing, and policy enforcement without requiring changes to application code. Popular service mesh solutions include Istio, Linkerd, and Cilium Service Mesh.
