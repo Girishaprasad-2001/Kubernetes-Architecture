@@ -4255,3 +4255,29 @@ Instead of exposing each service with its own LoadBalancer, Ingress provides a s
 # What is Egress in Kubernetes?
 
 Egress refers to outbound traffic from applications running inside a Kubernetes cluster to destinations outside the cluster.
+# Complete Architecture Diagram
+```
+kubectl apply -f deployment.yaml
+                |
+                v
+          API Server
+                |
+                v
+              etcd
+                |
+                v
+         Deployment
+                |
+                v
+          ReplicaSet
+                |
+      -------------------
+      |        |        |
+    Pod1     Pod2     Pod3
+      |        |        |
+      ---------- Scheduler
+                |
+      -------------------
+      |                 |
+   Worker1          Worker2
+```
