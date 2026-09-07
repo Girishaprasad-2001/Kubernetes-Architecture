@@ -4245,3 +4245,13 @@ Kubernetes Service Mesh is an infrastructure layer that manages service-to-servi
 # What is Istio in Kubernetes?
 
 Istio is an open-source service mesh platform that runs on Kubernetes and provides traffic management, security, and observability for microservices without requiring changes to application code.
+
+# What is Ingress in Kubernetes?
+
+Ingress is a Kubernetes API object that manages external access to services inside a Kubernetes cluster, typically HTTP and HTTPS traffic.
+
+Instead of exposing each service with its own LoadBalancer, Ingress provides a single entry point and routes traffic to different services based on rules such as hostname or URL path.
+
+# What is Egress in Kubernetes?
+
+Egress refers to outbound traffic from applications running inside a Kubernetes cluster to destinations outside the cluster.
