@@ -4241,3 +4241,7 @@ In Kubernetes, ConfigMaps store non-sensitive configuration such as environment 
 
 # Kubernetes Service Mesh 
 Kubernetes Service Mesh is an infrastructure layer that manages service-to-service communication in a Kubernetes cluster. It uses sidecar proxies to provide traffic management, security (mTLS), observability, retries, load balancing, and policy enforcement without requiring changes to application code. Popular service mesh solutions include Istio, Linkerd, and Cilium Service Mesh.
+
+# What is Istio in Kubernetes?
+
+Istio is an open-source service mesh platform that runs on Kubernetes and provides traffic management, security, and observability for microservices without requiring changes to application code.
